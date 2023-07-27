@@ -6,7 +6,7 @@
 \usepackage{mathtools}
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage{minted}
+% \usepackage{minted}
 \usepackage{float}
  % no indent
 \usepackage{parskip}
@@ -32,19 +32,8 @@
 	linkcolor=blue,
 	filecolor=magenta,      
 	urlcolor=cyan,
-    citecolor=cyan,
+	citecolor=cyan,
 }
-
-% bibliography
-% https://tex.stackexchange.com/questions/51434/biblatex-citation-order
-% https://www.reddit.com/r/LaTeX/comments/k8tz0q/citation_in_wrong_numerical_order/
-\usepackage[
-    backend=biber, 
-    natbib=true,
-    style=numeric,
-    sorting=none
-]{biblatex}
-\addbibresource{report.bib}
 
 % opening
 \title{\textbf{Project Proposal: ``Design, Verification and Synthesis of a RISC-V RV32IC Processor"}}
@@ -410,12 +399,14 @@ most simple branch predictors, but should actually show a performance increase.
 % of memory arbiter, or it would be the programmer's responsibility to guard every single memory access that 
 % could clash. I'd also need to figure out a way to determine where each core starts executing code from. 
 
-% \subsection{ASIC tapeout using OpenLane}
-% This is the most challenging subproject, as it is almost another paper in and of itself. It is very, very 
-% unlikely that this will actually be done. However, in this project, I'd tape out Jelly into an ASIC using 
-% open source tools. I would target Skywater Technologies' 130 nm process node, using Google's free PDK. The 
-% synthesis tool would be a mix of Yosys and OpenLane for place and route. This would be extremely complex to 
-% verify, as while open source tools \textit{can} run a full tapeout, they don't have good power and thermal 
-% analysis tools.
+\subsection{SkyWater 130 nm VLSI tapeout using OpenLane}
+This is the most challenging subproject, as it is almost another paper in and of itself. It is very, very 
+unlikely that this will actually be done. However, in this project, I'd tape out Jelly into an ASIC using 
+open source tools. I would target SkyWater Technologies' 130 nm process node, using Google's free PDK. The 
+synthesis tool would be a mix of Yosys for synthesis and OpenLane for place and route. This would be extremely 
+complex to verify, as while open source tools \textit{can} run a full tapeout, they don't have good power and 
+thermal analysis tools. In addition, we would need to instantiate PDK-specific SRAM cells for the data memory
+of the CPU. Having this actually manufactured would be too expensive (and be somewhat of a waste for a processor
+as simple as Jelly), but the experience gained taping out the processor might be beneficial.
 
 \end{document}

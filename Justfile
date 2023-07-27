@@ -1,5 +1,5 @@
 PDFLATEX_COMMAND := "pdflatex -shell-escape -interaction=batchmode -halt-on-error"
-LATEXMK_COMMAND := "latexmk -shell-escape -pdf -quiet"
+LATEXMK_COMMAND := "latexmk -shell-escape -pdf"
 
 default:
 	@just --list
