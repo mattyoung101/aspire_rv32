@@ -45,11 +45,15 @@
 
 \tableofcontents
 
+% FIXME this section needs to be improved
+% FIXME consider using GateMate FPGA? docs seem better and we have the eval board as well
+% or even the ice40 if we can find one big enough
 \section{Executive summary (tl;dr)}
 \begin{enumerate}
-	\item I want to design, verify, and implement on an FPGA, a simple 32-bit RISC-V CPU core called "Jelly". The CPU
-	      will be entirely designed and built by myself, from scratch.
-	\item The design's goal is to be as simple as possible, while still allowing flexibility for future improvements.
+	\item For my BCompSc Hours thesis, I want to design, verify, and implement on an FPGA, a simple 32-bit 
+		  RISC-V CPU core. The CPU will be entirely designed and built by myself, from scratch.
+	\item The design multi-cycle, non-pipelined to ensure that I can complete it in only a year. However, it
+		  is designed flexibly to allow for future improvements.
 	\item Design, verification and logic synthesis will all be done using free and open-source tools.
 	\item I also already own the Lattice ECP5-85K FPGA that will be used, so I don't need any funding or budget for
 	      this project - other than possibly access to electronics test equipment like a logic analyser.
@@ -57,8 +61,8 @@
 	      any prior art).
 	\item I believe I can achieve the above goals as I have experience with SystemVerilog and FPGAs already, I own all
 	      the tools required, and have been researching on this topic since about 2021.
-	\item There are some extension tasks such as adding a pipeline and multiply instructions that I may attempt if time
-	      permits.
+	\item There are some extension tasks such as adding some speculation, a CLZ instruction and a pipeline
+		  that I can attempt if time permits.
 	\item Your involvement as a supervisor would be much appreciated!
 \end{enumerate}
 
@@ -91,20 +95,25 @@ attractive ISA to design a research processor around.
 \subsection{This project}
 The goal of my thesis is to design, verify and synthesise a simple 32-bit RISC-V CPU core (specifically one
 which implements the RV32IC ISA - which will be covered shortly). The implementation platform will be the
-Lattice ECP5-85K FPGA, which I already own via the OrangeCrab devkit.
+Lattice ECP5-85K FPGA, which I already own via the OrangeCrab devkit. The implementation language will be
+SystemVerilog, as detailed further below.
 
 This project has the codename "Jelly", in
 reference to the jellyfish, which is apparently one of the simplest and most efficient animals, which are
 similar goals to this CPU.
 
 \section{Microarchitecture design}
-Jelly's goal is to provide as simple of a microarchitecture as reasonably possible, so that I can be certain
-I can get the project done in time, while still allowing flexibility for future upgrades and
-improvements.
+Building a CPU from scratch is a complex task, especially for a first-timer, and one year is not an especially
+long time. To ensure that I can complete the project to a very high standard, Jelly's microarchitecture is
+relatively simple as far as industry RISC-V processors go. However, although it may be slow, it will still be
+fully functional, and designed in such a way as to allow for flexibility and future upgrades (such as the
+extension tasks detailed later in this paper).
 
-The general design of the microarchitecture will be inspired by, although not directly lifted from, "Digital
-Design and Computer Architecture, RISC-V Edition" by Harris \& Harris. This is essentially the seminal book
-on introductory RISC-V microarchitecture design, and will have many good references for my own design.
+The processor will be designed with reference to "Digital Design and Computer Architecture, RISC-V Edition" 
+by Harris \& Harris. This is essentially the seminal book on introductory RISC-V microarchitecture design, and 
+will have many good references for my own design. However, my design will \textbf{not} be directly lifted from
+this book: I am only using it as a reference, and my design will diverge in significant ways from the textbook
+implementation. Additionally, the textbook only implements a very small subset of RISC-V instructions.
 
 \subsection{ISA}
 The specific architecture that Jelly aims to implement is RV32IC. This implements the base RISC-V integer
@@ -112,7 +121,7 @@ instruction set, RV32I, as well as the "C" Compressed Instruction extension. In 
 instructions and the "C" extension includes an additional 16 instructions. I will therefore have to implement
 and verify a total of 63 instructions. This sounds like a lot, but do keep in mind the 16 compressed
 instructions have a 1-1 mapping with uncompressed instructions - so I only need to prove that they decode
-correctly.
+correctly for it to be valid.
 
 The reason the "C" extension was added is that it's only some relatively simple extra logic in the decoder,
 and can significantly increase code density, leading to faster program execution.
@@ -123,14 +132,14 @@ for onboard performance timing, given we know the CPU's $fCLK$.
 \subsection{Pipeline}
 Unlike most processors, Jelly is \textit{not} pipelined (although this is an extension task). As stated
 above, the goal for Jelly is to be as simple as possible, and although a simple 4-stage RISC pipeline is well
-documented, it may increase complexity and verification difficulty due to data hazards.
+documented and considered simple, it may increase complexity and verification difficulty due to data hazards.
 
 Instead, Jelly will perform the fetch, decode and execute operations on separate cycles. The completed
-instruction flow will look something like this:
+instruction flow may look something similar to this:
 
 \textbf{Fetch (cycle 1)}
 
-Instruction memory is clocked, bringing the instruction at PC from the IMEM to chip registers. Although
+Instruction memory is clocked, bringing the instruction at PC from IMEM to chip registers. Although
 Jelly's IMEM is backed by FPGA BRAM, it still takes at least one cycle to read the data in this BRAM.
 
 \textbf{Decode (cycle 2)}
@@ -149,6 +158,8 @@ stage will be re-run until the instruction has completed. If the instruction is 
 then the load-store unit is asked to begin reading or writing to RAM. If the instruction specifically was a
 load instruction, then execute may need to be re-run to read the value from RAM. If the instruction was a
 branch, then the branch target is also computed by the ALU in this stage.
+
+% TODO can we skip writeback somehow? surely we can just do reg[i] <= a + b; right?
 
 \textbf{Writeback (cycle 4)}
 
@@ -170,7 +181,8 @@ on flags and information set previously (e.g. jumps, branches, traps, etc).
 % CYCLE 2: ALU and BU are run based on previous operands
 % CYCLE 3: if required, LSU runs to store results back to RAM
 
-% TODO: could we combine LSU and ALU together in combinatorial logic? then, instead of CYCLE 3, the results would be stored to BRAM when we come around again on CYCLE 0
+% TODO: could we combine LSU and ALU together in combinatorial logic? then, instead of CYCLE 3, the results 
+% would be stored to BRAM when we come around again on CYCLE 0
 
 \subsection{Memory and privilege}
 The CPU will only implement the RISC-V Unprivileged ISA, as Jelly effectively shares its processing class
@@ -185,12 +197,8 @@ Although Jelly's instruction memory is backed by BRAM during execution, the prog
 external Winbond SPI flash module, to allow for simpler runtime programming without re-flashing the FPGA
 itself. This copy operation will be implemented as a separate CPU hardware peripheral that runs before boot,
 being completely invisible and inaccessible to the end-user. All it will do is use quad SPI fast-read mode to
-read the first 128 KiB from the flash chip using Winbond's protocol, so should take only a few milliseconds
-after the PLL stabilises.
-
-Note that the above SPI flash module will be separate and distinct SystemVerilog from the main CPU. This
-means that, should Jelly be synthesised for an ASIC in the future, this module could easily be removed or
-replaced with on-chip flash.
+read the first 128 KiB from the flash chip using Winbond's protocol, which should take no more than a few
+milliseconds after the FPGA boot process completes.
 
 \textbf{TODO: memory map}
 
@@ -205,12 +213,16 @@ Jelly will most likely implement an interrupt system similar to the AVR. At the 
 interrupt vector table will list jump addresses for specific types of interrupts, which the processor will
 jump to if an ISR or fault occurs.
 
+% FIXME this section should be made more clear when user-code starts, perhaps with colour coding
+% FIXME OSCG MAY not accurate enough (+/- 15% in output frequency) for accurate benchmarks! need imperical
+% tests to verify on a scope
 \subsection{Boot process}
 \begin{enumerate}
 	\item Power is sent to the FPGA, triggering its internal reset circuitry
-	\item FPGA loads Jelly's RTL from SPI flash or on-chip memory
+	\item The FPGA loads Jelly's RTL from SPI flash mounted to OrangeCrab board
 	\item Jelly RTL begins executing
-	\item Jelly initialises the OSCG oscillator and waits 1000 clocks for it to stabilise
+	\item Jelly initialises the OSCG oscillator and waits for it to stabilise if necessary. OSCG is what Jelly
+		uses as its internal clock generator.
 	\item SPI module copies first 128 KiB from Winbond SPI flash into BRAM
 	\item CPU state is reset
 	\item PC is set to \textbf{TODO: instruction memory addr} and the CPU begins executing instructions from there
@@ -218,7 +230,8 @@ jump to if an ISR or fault occurs.
 
 \subsection{Other microarchitecture details}
 The remaining details, such as what units the processor has and how it's organised on a lower level, will be
-decided while the thesis is in progress, as this will likely be an iterative process.
+decided while the thesis is in progress, as this will likely be an iterative process. Additionally, the 
+microarchitecture described above is not set in stone, and may change during the course of development.
 
 \section{Tools and resources}
 \subsection{HDL}
@@ -298,20 +311,24 @@ Once synthesised for the FPGA, I will measure the total CoreMark score and CoreM
 compare against similar processors. In simulation, I will compare against an "ideal" 100 MHz clock speed, to
 gauge how the processor might perform on an ideal ASIC tapeout.
 
-I also plan to run the RV32 port of FreeRTOS on the core and verify that context switching works as intended.
+% This is a lotta extra work, potentially...
+% I also plan to run the RV32 port of FreeRTOS on the core and verify that context switching works as intended.
 
 Unfortunately, I cannot guarantee a particular clock frequency as a deliverable, because this is extremely
-challenging to estimate at this early stage in the project. We can certainly target $>$ 16 MHz as a
-reasonable goal, and we could theoretically reach up to 100 MHz with significant optimisation. The purpose of
-the benchmarking is to compare Jelly against existing industry designs, and to understand the processor's
-strengths and weaknesses.
+challenging to estimate at this early stage in the project. A reasonable goal might be 10-30 MHz, and then
+I can feel accomplished if (hopefully, when) this goal is met and exceeded.
+
+The overall purpose of benchmarking the CPU is to compare it against existing industry designs, and to 
+understand the processor's strengths and weaknesses. For example, it will probably have a small footprint,
+but Jelly's in-order, multi-cycle design means it will not perform extremely well compared to modern, speculative
+CPUs.
 
 \section{Possible extension tasks}
 This section contains improvements that I will add to Jelly if time permits. They are ordered in the order
 that I would attempt them (simplest first).
 
-\textbf{Note:} These are only suggestions for extension tasks. I may not attempt any of these at all, and 
-definitely won't attempt all of them.
+\textbf{Note:} These are only suggestions for extension tasks. I may not attempt any of these at all, and I
+almost certainly won't attempt all of them.
 
 \subsection{Implement "speculative pre-fetching"}
 Being a non-pipelined processor, Jelly fetches instructions on one cycle and executes them on the next. In
@@ -345,6 +362,11 @@ In this task, we'll implement a part of the RISC-V Bit Manipulation instruction 
 various types of algorithms and cryptography, and is a good example of how specialised hardware can be orders
 of magnitude faster than software.
 
+The implementation of this would have to be single-cycle, and would be most likely backed by either some
+type of balanced tree or binary search algorithm, as detailed here:
+
+\url{https://electronics.stackexchange.com/a/196992}
+
 \subsection{Add "M" and "D" extensions}
 In this task, I'll add the RISC-V Multiply and Divide extensions. Of these, the "M" extension is the most
 important because multiply is usually more commonly used than divide.
@@ -361,12 +383,13 @@ I plan to use the classic RISC pipeline, as it is the easiest to implement and t
 stages for this pipeline are: fetch, decode, execute, write-back. We could also look into implementing a
 shorter or longer pipeline.
 
-This will involve a fair amount of work, because we will need to re-verify the entire processor to make sure
+This will involve a large amount of work, because we will need to re-verify the entire processor to make sure
 that it handles hazards correctly. I plan to handle hazards simply by stalling, as this is an in-order
 machine.
 
 As fun as this is, I would only really attempt this if I complete and verify the Jelly design significantly
-\textit{ahead} of schedule (e.g. 6 months ahead of schedule), as it would be a lot of work.
+\textit{ahead} of schedule (e.g. 6 months ahead of schedule), as it would be a lot of work, and I would have
+to abandon it if the deadline approached.
 
 \subsection{Add a simple branch predictor}
 With the pipeline created, conditional branches may cause problems with stalling. Most modern processors use
@@ -375,8 +398,11 @@ a \textit{branch predictor}, a circuit that attempts to guess which way a branch
 The algorithm I plan to use is a 2-bit saturating counter (as documented on Wikipedia). This is one of the
 most simple branch predictors, but should actually show a performance increase.
 
+% NOTE: We probably don't need the L1i cache because we copy all program into BRAM
+% This implies that we can actually eXecute In Place and we don't have to be tricky about separate IMEM/DMEM
+% i.e. we can just allocate one massive dual port BRAM and allocate 1/4 to code and 3/4 to data
+
 % \subsection{Add a 1 KiB L1i Cache}
-% \textbf{FIXME: we shouldn't need this because of BRAM}
 
 % In this task, I will add a 1 KiB L1 instruction cache. Since access to the SPI flash will be extremely slow 
 % for the CPU, this should hopefully improve processor speeds significantly.
@@ -389,6 +415,8 @@ most simple branch predictors, but should actually show a performance increase.
 % FPGA BRAM - the exact same technology that the cache would be backed with, making it redundant. Also, according 
 % to my research, DFF-backed RAM and BRAM-backed RAM have similar access times. Overall, it would just be more 
 % of a waste of space.
+
+% NOTE: Dual core is probably too difficult for this project, I'd rather spend the time on VLSI if we get this far
 
 % \subsection{Dual core}
 % In this task, I will turn the processor from a single-core machine into a dual-core one. This should be 
