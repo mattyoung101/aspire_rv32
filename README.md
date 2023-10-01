@@ -3,12 +3,14 @@ Jelly is a RISC-V CPU, designed in SystemVerilog, that implements the RV32IC ins
 The project will (hopefully) be started in Semester 2 2024, as part of my Bachelor of Computer Science (Honours)
 thesis at the University of Queensland.
 
-Jelly is designed, verified and synthesised using entirely open-source tools.
+Jelly is designed, verified and synthesised entirely by me, from scratch, using only open-source tools.
 
 **Author:** Matt Young (m.young2@uqconnect.edu.au)
 
 ## Features
-TBA
+- Implements RISC-V RV32IC ISA (base + "C" Compressed Instructions extension)
+- Written in SystemVerilog
+- Synthesisable for Lattice ECP5 FPGA and theoretically VLSI
 
 ## Getting started with Jelly
 ### Setting up the toolchain

@@ -35,30 +35,42 @@
 	citecolor=cyan,
 }
 
+% bibliography
+% https://tex.stackexchange.com/questions/51434/biblatex-citation-order
+% https://www.reddit.com/r/LaTeX/comments/k8tz0q/citation_in_wrong_numerical_order/
+\usepackage[
+    backend=biber, 
+    natbib=true,
+    style=numeric,
+    sorting=none
+]{biblatex}
+\addbibresource{proposal.bib}
+
 % opening
 \title{\textbf{Project Proposal: ``Design, Verification and Synthesis of a RISC-V RV32IC Processor"}}
 \author{Matt Young \\ s4697249 \\ m.young2@uqconnect.edu.au}
-\date{May 2023}
+\date{October 2023}
 
 \begin{document}
 \maketitle
 
 \tableofcontents
 
+\clearpage
+
 % FIXME this section needs to be improved
 % FIXME consider using GateMate FPGA? docs seem better and we have the eval board as well
 % or even the ice40 if we can find one big enough
-\section{Executive summary (tl;dr)}
+\section{Executive summary}
 \begin{enumerate}
-	\item For my BCompSc Hours thesis, I want to design, verify, and implement on an FPGA, a simple 32-bit 
+	\item For my BCompSc Honours thesis, I want to design, verify, and implement on an FPGA, a simple 32-bit 
 		  RISC-V CPU core. The CPU will be entirely designed and built by myself, from scratch.
-	\item The design multi-cycle, non-pipelined to ensure that I can complete it in only a year. However, it
+	\item The design will be multi-cycle and non-pipelined to ensure that I can complete it in only a year. However, it
 		  is designed flexibly to allow for future improvements.
-	\item Design, verification and logic synthesis will all be done using free and open-source tools.
+	\item Design, verification and logic synthesis will all be done using free and open-source tools
+		like Yosys, Verilator and Nextpnr.
 	\item I also already own the Lattice ECP5-85K FPGA that will be used, so I don't need any funding or budget for
 	      this project - other than possibly access to electronics test equipment like a logic analyser.
-	\item This may possibly be the first CPU designed at UQ (or at least, in recent memory - as I was unable to find
-	      any prior art).
 	\item I believe I can achieve the above goals as I have experience with SystemVerilog and FPGAs already, I own all
 	      the tools required, and have been researching on this topic since about 2021.
 	\item There are some extension tasks such as adding some speculation, a CLZ instruction and a pipeline
@@ -85,7 +97,7 @@ by a lowly computer science undergraduate without the risk of being sued.
 
 Furthermore, RISC-V enjoys support from popular compiler toolchains, software vendors and the wider
 semiconductor industry. Many large companies such as NVIDIA, Western Digital, Seagate, Alibaba and Intel have
-taped out RISC-V processors that are currently in shipping products. There are also numerous RISC-V startups
+taped out RISC-V processors that are currently deployed in real products. There are also numerous RISC-V startups
 like SiFive, Tenstorrent, Esperanto and more who design new and novel processors.
 
 Existing RISC-V processors can happily boot Linux, compile code with Clang and GCC, and even run complex
@@ -95,7 +107,11 @@ attractive ISA to design a research processor around.
 \subsection{This project}
 The goal of my thesis is to design, verify and synthesise a simple 32-bit RISC-V CPU core (specifically one
 which implements the RV32IC ISA - which will be covered shortly). The implementation platform will be the
-Lattice ECP5-85K FPGA, which I already own via the OrangeCrab devkit. The implementation language will be
+Lattice ECP5-85K FPGA, which I already own via the OrangeCrab devkit. 
+\footnote{An alternative implementation platform is the GateMate A1 FPGA and its evaluation board, which may be used
+if implementation difficulties arise with clocking the Lattice. This board is supported by the
+same open source tool flow (Yosys).}
+The implementation language will be
 SystemVerilog, as detailed further below.
 
 This project has the codename "Jelly", in
@@ -110,24 +126,24 @@ fully functional, and designed in such a way as to allow for flexibility and fut
 extension tasks detailed later in this paper).
 
 The processor will be designed with reference to "Digital Design and Computer Architecture, RISC-V Edition" 
-by Harris \& Harris. This is essentially the seminal book on introductory RISC-V microarchitecture design, and 
+by Harris \& Harris \cite{harrisharris}.
+This is essentially the seminal book on introductory RISC-V microarchitecture design, and 
 will have many good references for my own design. However, my design will \textbf{not} be directly lifted from
 this book: I am only using it as a reference, and my design will diverge in significant ways from the textbook
 implementation. Additionally, the textbook only implements a very small subset of RISC-V instructions.
 
 \subsection{ISA}
-The specific architecture that Jelly aims to implement is RV32IC. This implements the base RISC-V integer
-instruction set, RV32I, as well as the "C" Compressed Instruction extension. In total, RV32I includes 47
-instructions and the "C" extension includes an additional 16 instructions. I will therefore have to implement
-and verify a total of 63 instructions. This sounds like a lot, but do keep in mind the 16 compressed
-instructions have a 1-1 mapping with uncompressed instructions - so I only need to prove that they decode
-correctly for it to be valid.
+The exact architecture that Jelly aims to implement is \verb|RV32IC_Zicsr_Zicntr|. 
+This implements the base RISC-V integer
+instruction set, RV32I, the "C" Compressed Instruction extension, control and status registers (CSR)
+and performance counters. In total, RV32I includes 47
+instructions, the "C" extension includes an additional 16 instructions, the Zicsr extensions adds 6. 
+So, in total, I would need to implement and verify 69 instructions.
 
 The reason the "C" extension was added is that it's only some relatively simple extra logic in the decoder,
-and can significantly increase code density, leading to faster program execution.
-
-We will also support Chapter 10, "Performance Counters", specifically the CYCLE counter. This will be used
-for onboard performance timing, given we know the CPU's $fCLK$.
+and can significantly increase code density, leading to faster program execution. The Zicntr extension is
+necessary for onboard performance metrics (see the "Benchmarking" section), and Zicsr is a dependency of Zicntr
+so is required for this design.
 
 \subsection{Pipeline}
 Unlike most processors, Jelly is \textit{not} pipelined (although this is an extension task). As stated
@@ -147,7 +163,8 @@ Jelly's IMEM is backed by FPGA BRAM, it still takes at least one cycle to read t
 The instruction is decoded by combinatorial logic into its operands. This will probably involve decoding the
 instruction to ALU, LSU (load store unit) and BU (branch unit) operands. If the instruction failed to decode
 in this stage, the illegal instruction flag will be set, and Jelly will eventually jump to the fault handler
-(which exists at a fixed address in RAM). (TODO: maybe use handler jump table like AVR).
+(which exists at a fixed address in RAM). 
+% (TODO: maybe use handler jump table like AVR).
 
 \textbf{Execute (cycle 3)}
 
@@ -200,12 +217,14 @@ being completely invisible and inaccessible to the end-user. All it will do is u
 read the first 128 KiB from the flash chip using Winbond's protocol, which should take no more than a few
 milliseconds after the FPGA boot process completes.
 
-\textbf{TODO: memory map}
+The exact memory map of the processor will be determined at a later stage, as it depends on the final details
+of the microarchitecture and particularly FPGA resource utilisation. Nonetheless, the memory map will most
+likely be similar to that outlined in Harris \& Harris, with the addition of an interrupt vector table.
 
 \subsection{Interrupts}
 I don't have massive plans in terms of the interrupt controller - just something that works enough to get
 UART in and out, and to handle system traps like an illegal instruction. This is somewhat of a departure from
-the microcontroller design specification, however, it's worth nothing that Jelly is not capable of being an
+the microcontroller design specification, however, it's worth noting that Jelly is not capable of being an
 actual MCU as it's missing other peripherals like GPIO. There are currently no plans for any sort of nested
 interrupt controller at all.
 
@@ -221,11 +240,11 @@ jump to if an ISR or fault occurs.
 	\item Power is sent to the FPGA, triggering its internal reset circuitry
 	\item The FPGA loads Jelly's RTL from SPI flash mounted to OrangeCrab board
 	\item Jelly RTL begins executing
-	\item Jelly initialises the OSCG oscillator and waits for it to stabilise if necessary. OSCG is what Jelly
-		uses as its internal clock generator.
+	\item Jelly initialises a PLL oscillator and waits for it to stabilise if necessary. Jelly will use this
+		oscillator as its internal clock generator.
 	\item SPI module copies first 128 KiB from Winbond SPI flash into BRAM
 	\item CPU state is reset
-	\item PC is set to \textbf{TODO: instruction memory addr} and the CPU begins executing instructions from there
+	\item PC is set to the code segment base address and the CPU begins executing instructions from there
 \end{enumerate}
 
 \subsection{Other microarchitecture details}
@@ -239,21 +258,23 @@ Jelly will be implemented using the \textbf{SystemVerilog} hardware description 
 because I already have familiarity with it, having started around November 2022, and it makes describing
 complex designs easier than plain Verilog or VHDL.
 
-In addition, I have spent the last year developing "Slingshot", a SystemVerilog Language Server Protocol 
-(LSP). This provides editor completion and diagnostics services, making SV a very productive language for
+In addition, I have spent some months working on "Slingshot", a SystemVerilog Language Server Protocol 
+(LSP). \footnote{This tool may possibly be capable of being a thesis in its own right, if that is preferred
+over the main CPU design project described in this document.}
+This provides editor completion and diagnostics services, making SV a very productive language for
 me to edit in. Slingshot was specifically developed in anticipation of this thesis.
 
 \subsection{Simulation, verification and synthesis}
 For simulation and verification, I will depend exclusively on open source tools. These are perfectly fine for
 my use-case, and most importantly, free. The specific tools are:
 \begin{itemize}
-	\item \textbf{Verilator}: An open-source, fast, cycle-accurate SystemVerilog simulator that works by 
+	\item \textbf{Verilator} \cite{verilator}: An open-source, fast, cycle-accurate SystemVerilog simulator that works by 
 		transpiling SV to C++. It will be used extensively for verification. The only downside is it 
 		doesn't support verification methodologies like UVM, which is acceptable because I will be 
 		verifying the processor using a different method (see below).
-	\item \textbf{Yosys}: An open-source EDA synthesis tool. Yosys is capable of synthesising SystemVerilog 
+	\item \textbf{Yosys} \cite{shah2019yosysnextpnr}: An open-source EDA synthesis tool. Yosys is capable of synthesising SystemVerilog 
 		to a netlist, which will be used for FPGA implementation.
-	\item \textbf{nextpnr}: An open-source place and route tool. Nextpnr has support for Lattice ECP5 
+	\item \textbf{nextpnr} \cite{shah2019yosysnextpnr}: An open-source place and route tool. Nextpnr has support for Lattice ECP5 
 		FPGAs, and will be run after Yosys to place and route the synthesised netlist.
 	\item \textbf{Catch2}: An open-source unit testing framework for C++. This will be used to create 
 		basic unit tests for the SystemVerilog code after Verilator has translated it to C++.
@@ -276,13 +297,12 @@ This will be a good initial test to prove that the design is functional, and sho
 These test suites are capable of auto-checking themselves, which will be very useful for detecting issues in
 the SystemVerilog code.
 
-The RISC-V test suite that will be used is available from here: \\
-\url{https://github.com/riscv-non-isa/riscv-arch-test}
+The RISC-V test suite that will be used is available from \cite{riscv}.
 
 \subsection{Random instruction generation}
-In this process, a tool called \textbf{force-riscv} will be used to randomly generate combinations of valid
+In this process, a tool called FORCE-RISCV \cite{forceriscv} will be used to randomly generate combinations of valid
 RISC-V instructions. Each of these instructions will then be run through the Jelly CPU, which we aim to
-verify, and the official \textbf{Spike} RISC-V simulator, which we know is valid. We will compare the
+verify, and the official Spike \cite{spikeriscv} RISC-V simulator, which we know is valid. We will compare the
 register state before and after each instruction, and make sure that Jelly is exactly identical to Spike.
 
 This will be run repeatedly for a gruelling 12 hour period, and all inconsistencies against Spike will be
@@ -363,9 +383,7 @@ various types of algorithms and cryptography, and is a good example of how speci
 of magnitude faster than software.
 
 The implementation of this would have to be single-cycle, and would be most likely backed by either some
-type of balanced tree or binary search algorithm, as detailed here:
-
-\url{https://electronics.stackexchange.com/a/196992}
+type of balanced tree or binary search algorithm, as detailed here in \cite{stackoverflow}.
 
 \subsection{Add "M" and "D" extensions}
 In this task, I'll add the RISC-V Multiply and Divide extensions. Of these, the "M" extension is the most
@@ -436,5 +454,8 @@ complex to verify, as while open source tools \textit{can} run a full tapeout, t
 thermal analysis tools. In addition, we would need to instantiate PDK-specific SRAM cells for the data memory
 of the CPU. Having this actually manufactured would be too expensive (and be somewhat of a waste for a processor
 as simple as Jelly), but the experience gained taping out the processor might be beneficial.
+
+\section{References}
+\printbibliography[heading=none]
 
 \end{document}
