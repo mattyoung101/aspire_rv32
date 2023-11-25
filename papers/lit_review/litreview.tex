@@ -1,0 +1,339 @@
+\documentclass[12pt]{article}
+% fix quotes: https://tex.stackexchange.com/a/52353
+\usepackage[english]{babel}
+\usepackage{hyperref} % URLS
+\usepackage{graphicx} % images
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{xcolor}
+% \usepackage{minted}
+\usepackage{float}
+ % no indent
+\usepackage{parskip}
+\usepackage[autostyle]{csquotes}
+\usepackage{helvet}
+% so we can stop latex hyphenating over new lines
+%\usepackage[none]{hyphenat}
+%\renewcommand{\familydefault}{\sfdefault}
+
+% https://www.overleaf.com/learn/latex/Page_size_and_margins
+% \usepackage{geometry}
+% \geometry{
+% 	a4paper,
+% 	total={170mm,257mm},
+% 	left=20mm,
+% 	top=20mm,
+% }
+
+% package instantiation
+\MakeOuterQuote{"}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+	citecolor=cyan,
+}
+
+% bibliography
+% https://tex.stackexchange.com/questions/51434/biblatex-citation-order
+% https://www.reddit.com/r/LaTeX/comments/k8tz0q/citation_in_wrong_numerical_order/
+\usepackage[
+    backend=biber, 
+    natbib=true,
+    style=numeric,
+    sorting=none
+]{biblatex}
+\addbibresource{litreview.bib}
+
+% opening
+\title{\textbf{RISC-V Processor Design Literature Review and Research Proposal Formulation}}
+\author{Matt Young \\ s4697249 \\ m.young2@uqconnect.edu.au}
+\date{November 2023}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+This document is a follow on from 
+"Project Proposal: Design, Verification and Synthesis of a RISC-V RV32IC Processor", which we discussed
+in early October 2023. As we discussed at the time, that project was interesting in a practical sense, but it 
+needed to address a specific \textit{research question} to be viable as a thesis. This document aims to find 
+that research question, both by detailing ideas that I myself have had over the past few years, as well as
+performing a relatively detailed literature review of recent papers published in the fields of RISC-V
+processor design and reconfigurable computing.
+
+Before we set out to find a specific research question, we should ask ourselves: What is an acceptable thesis
+project? My aim is to make this project the best it can possibly be, but the timeline of one year and my
+relative lack of experience in processor design introduces some constraints. Specifically, we want the project
+to be complex enough to explore relatively novel or non-traditional CPU design ideas, but we also need to make
+sure the project can be completed and written up comfortably in one year. Unfortunately, this particular
+constraint means I have to rule out some interesting ideas such as anything out-of-order, speculative or
+superscalar. It does also raise into question whether we attempt more complicated things such as multi/many-core
+designs (even if backed by a relatively simple per-core architecture), and VLIW. Nonetheless, these complicated
+topics are something I'm looking forward to considering in future research, but for now, I think we are best
+finding a concept that is simple in theory and can be safely executed in one year (considering other coursework
+as well). If the project does end up being too simple, we can always add extensions.
+
+\section{Methodology}
+To perform the literature review, we will consider both academia as well as industry. The aim is to determine
+what the latest research in academia is, and to compare that with what the latest industry trends are.
+
+The specific topics we will look into are:
+\begin{itemize}
+    \item RISC-V CPU architectures, preferably simpler ones
+    \item Low-power processor design
+    \item Very-long-instruction-word
+    \item Branch prediction algorithms, preferably simple, low-power ones
+    \item Reconfigurable computing
+    \item Custom instructions vs. Custom hardware, for domain-specific acceleration
+    \item Applications of custom processors and/or RISC-V in cybersecurity
+\end{itemize}
+
+Additionally, we will have a look at what the latest is in the following journals:
+\begin{itemize}
+    \item IEEE International Conference on Field-Programmable Technology (FPT)
+    \item Annual IEEE Symposium on Field-Programmable Custom Computing Machines (FCCM) 
+    \item Reconfigurable Architectures Workshop
+\end{itemize}
+
+Finally, note that we will exclude anything regarding AI and machine learning, purely because this is not
+a topic I'm interested in researching. That being said, a lot of AI-centric designs can be repurposed to do
+more interesting DSP work, so I won't completely discard AI papers if they seem to be useful for DSP.
+
+Before we start the literature review, however, I will first briefly detail some ideas I personally have
+come up with over the last two years or so, which might serve as useful research questions. The goal of the
+literature review, then, is to see which of these ideas are reasonable, as well as to discover new topics
+which I might not have considered yet. Once this is done, we will end up with a list of research questions
+which meet all the relevant criteria for my thesis!
+
+\section{Initial ideas from me}
+The following section details various paper ideas I've had over the last few years. The goal is to lay
+these out first, and then evaluate if they hold up to scrutiny as actually good ideas by performing the
+literature review. The ideas appear in the order of how much I think they are a reasonable project, with
+the most reasonable first and least reasonable last. Each idea has a suggested thesis title and abstract,
+along with pros/cons, and some additional notes, and finally a concluding verdict.
+
+Note that these are only the ideas I, personally, have come up with. In the process of performing the
+literature review, we will undoubtedly come across many more good ideas that I couldn't ever think of.
+We will catalogue both the ideas I've had, and ideas inspired by the literature review, in a final section.
+
+\subsection{A triple-redundancy fault tolerant RISC-V processor for safety-critical applications}
+\textbf{Abstract:} In recent years, there has been increasing interest in designing RISC-V processors for
+safety-critical applications. For example, NASA selected SiFive to provide a RISC-V processor for their 
+High-Performance Spaceflight Computing project. One way to design a fault tolerant processor is by using
+one or more redundant cores operating in lockstep. In this thesis, I design a RISC-V RV32ICM processor with
+three cores in a triply-redundant lockstep configuration. The design includes attractive features for embedded 
+computing such as a single-cycle 32x32 multiplier and a barrel shifter. The design is synthesised for
+the Lattice ECP5 FPGA using open-source tools, and the resulting physical implementation is benchmarked using
+CoreMark. Combined with a rad-hardened CMOS fabrication node, this processor may be an attractive offering for
+mission-critical computing in defence or space applications, or as an FPGA soft-core for industrial applications.
+
+\textbf{Pros:}
+
+\begin{itemize}
+    \item Interesting research topic, as I am interested in multi-/many-core designs
+    \item Definite real-world applications, probably more so as a softcore rather than an ASIC
+    \item The same processor can effectively be duplicated 3 times, it's just the redundancy and potentially
+	correction logic that is hard
+\end{itemize}
+
+\textbf{Cons:}
+
+\begin{itemize}
+    \item Redundancy logic may be difficult to verify, difficult to prove it's actually redundant (I imagine
+	a lot of edge cases)
+    \item We will probably encounter significant difficulties with verification, especially with
+	fault-tolerance.
+    \item We may encounter significant time-pressures as designing a RV32 core is complex enough, and the
+	fault tolerant logic adds extra verification work.
+\end{itemize}
+
+\textbf{Notes:}
+
+\begin{itemize}
+    \item We need to \textit{very} carefully scope out this project and define \textit{exactly} what we mean
+	by "fault tolerant". This will most likely involve designing to be immune to certain types of single
+	event upsets.
+    \item We need to research ways we can reliably introduce single event upsets into both our simulated and
+	real-world system to prove fault-tolerance. This may be extremely challenging.
+    \item A quick search reveals that there are many existing papers on fault tolerant RISC-V design - we
+	could learn a lot from these.
+\end{itemize}
+
+\textbf{Verdict:} I think this is a good project, it's achievable and has backup options. We should explore 
+research and strongly consider this idea. Specifically, we need to research the why and how of fault tolerant
+hardware design, see if anyone's made a fault-tolerant RISC-V processor (and if so, how they did it), and also
+particularly understand triple-redundancy.
+
+\subsection{A VLIW RISC-V processor for embedded DSP applications}
+\textbf{Abstract:} Digital signal processing (DSP) has become an increasingly important workload for
+edge computing devices, such as microcontrollers and low-power microprocessors. Yet, maintaining
+high DSP performance while managing power remains a difficult challenge. VLIW processors have a long
+history in the DSP segment of the semiconductor industry for their ability to achieve high
+performance while requiring only simple, low-power hardware. In this thesis, I explore designing a
+very-long-instruction-word (VLIW) RISC-V processor with specific extensions for fixed-point
+calculations, ideal for DSP workloads. The processor uses a special VLIW encoding based on the
+RISC-V RV32IM ISA, and processes 128-bit words for a maximum of 4 issues per clock. Each of the 4
+execution unit supports a single-cycle 32x32 multiplier. I synthesise this design for the Lattice
+ECP5 FPGA using open-source tools, and measure its power, performance and area (PPA) against
+competing RISC-V processors on a simple DSP workload.
+
+\textbf{Pros:}
+
+\begin{itemize}
+    \item Very interesting research: combines bits of my two favourite interests, processor design and 
+	high-performance computing
+    \item Some potential real-world applications, although not as much as other topics
+    \item Relatively novel research, there are not many papers on RISC-V VLIW encodings
+    \item Strictly speaking, VLIW hardware is not "that" hard (it's just the writing the decoder and verifying
+	it that's the hard part - the functional units can be easily duplicated)
+\end{itemize}
+
+\textbf{Cons:}
+
+\begin{itemize}
+    \item Harder to verify: unlike a traditional RV32IC core, the encoding is semi-custom, so we can't use
+	any existing RISC-V verification suites or instruction fuzzers
+    \item May encounter significant difficulties with the register file, especially since the ECP5 only
+	supports a maximum of dual-port RAM, where we may need quad-port or higher for VLIW
+    \item No RISC-V VLIW compilers (and writing a compiler out of scope for this thesis), so we would have 
+	to write an assembler and then program DSP algorithms in assembly - ouch!
+    \item Although VLIW is cool (in my opinion), it's not as applicable in industry as a more standard RV32
+	design
+\end{itemize}
+
+\textbf{Notes:}
+
+\begin{itemize}
+    \item We need to clarify exactly what is meant by "fixed point extensions" - what hardware is involved in
+	this? Do we want a CORDICS module?
+\end{itemize}
+
+\textbf{Verdict:} Explore more research. This may be too hard for us right now.
+
+\subsection{A runtime reconfigurable microarchitecture for RISC-V processors}
+\textbf{Abstract:} Modern processors are designed with power, performance and area (PPA) in mind.
+However, at times, these goals can be conflicting: a low-power design naturally reduces performance, and
+a high-performance design increases power. In this thesis, I introduce a RISC-V RV32IC processor with a
+runtime reconfigurable microarchitecture. End-users can configure the processor's microarchitecture at
+runtime to dynamically target the goals of high-performance or low-power, with a great deal of flexibility. 
+This is achieved by installing both a "high-performance" and "low-power" microarchitecture on the same
+chip, and using clock-gating and a re-routing system based on writes to a specific register.
+The design is synthesised for the Lattice ECP5 FPGA using open-source tools, and real-world power and 
+performance metrics are analysed.
+
+\textbf{Pros:}
+
+\begin{itemize}
+    \item Interesting research topic
+    \item Potential real-world applications and future research options
+\end{itemize}
+
+\textbf{Cons:}
+
+\begin{itemize}
+    \item Unclear if my ideas for the low-power side of things will actually work
+    \item In particular, the multi-cycle design from Harris \& Harris may actually draw more power than a
+	pipelined design. This would need some serious analysis.
+    \item Requires essentially implementing two processors: high performance and low power
+\end{itemize}
+
+\textbf{Notes:}
+
+\begin{itemize}
+    \item Instead of implementing two CPUs from scratch, we could borrow existing implementations - this is
+	less fun though
+    \item Following Harris \& Harris might naturally allow us to come up with the "low power" and "high performance"
+	designs
+    \item How does this compare to big.LITTLE style designs (i.e. heterogeneous computing)? I
+	discarded the idea of making a big.LITTLE style CPU because, in my opinion, it doesn't make sense to
+	do for a microcontroller. Does a "reconfigurable microarchitecture" make any sense on a
+	microcontroller either? We may not see much power difference unless you compare something like an OoO
+	design with a in-order design, and of course OoO is \textit{way} out of our league.
+\end{itemize}
+
+\textbf{Verdict:} This is an interesting question, but it may be hard both be hard to implement, and we
+may not see any real power savings. It also may not make sense to do for a microcontroller style CPU anyway.
+
+\subsection{Design and implementation of a low-power RISC-V RV32IC processor}
+\textbf{Abstract:} With the ever increasing number of battery-powered smart devices in the world today,
+low-power processor design is becoming a very active field in computer architecture research. Traditionally,
+architectures like Arm and MIPS have been the main targets of low-power designs - yet, in recent years, the
+open-source RISC-V architecture has become a driving force in the industry. In this thesis, I design a
+low-power RISC-V RV32ICM processor by exploring common low-power design methodologies used in industry and
+research. The resulting design is synthesised for the Lattice ECP5 FPGA using open-source tools, and is
+extensively benchmarked, both for power and performance. I show how details like pipeline depth and ALU design
+can create interesting trade-offs between a processor's performance and its power consumption.
+
+% This literally makes no sense to do with a microcontroller. We should wait until we have the capability
+% to tape out an actual RV64GC SoC.
+%
+% \subsection{Design of a heterogeneous RISC-V RV32IC processor}
+% \textbf{Abstract:} With the increasing importance of edge computing devices in industry, heterogeneous
+% processor architectures have become more and more widespread designs. One of the most popular heterogeneous
+% architectures is Arm's big.LITTLE, which couples a slower, power efficient core ("LITTLE") with a more
+% power hungry, higher performance core ("big"). The kernel is able to schedule applications to switch between
+% these cores to target low-power or high-performance.
+%
+% Basically ARM big.LITTLE but for risc-v
+
+% TODO IDEA: comparing performance & power of DSP workloads with and without hardware multiply
+
+\section{Literature reviews}
+This brief literature review aims to determine what the latest research in both reconfigurable computing
+and processor design is. The reconfigurable computing journals I will be analysing are the IEEE FPT 
+and FCCM, as well as the RAW workshop (not from IEEE). On the processor design side, the journals that will
+be analysed are: 
+
+\subsection{Reconfigurable computing}
+As might be expected, accelerating compute-intensive workloads remains one of the principal applications of
+reconfigurable computing. However, the most "trendy" workload to accelerate at the moment appears to be
+machine learning, specifically deep learning. In my opinion, I believe that there are more devices actually
+deployed in the real-world that need DSP accelerating,
+\footnote{I have no actual evidence to back this up other than a gut feeling.}
+however, undoubtedly the more popular research topic
+is machine learning. Although DSP remains an incredibly important workload for FPGAs, machine
+learning is being added to more and more devices, so will become an increasingly important workload as
+years go on. Already, we've seen manufacturers like Xilinx offer AI-tuned SoCs and IP cores.
+
+Other workloads that remain popular for FPGA acceleration include data compression, as shown in
+\cite{Dongdong2022}. The authors in this particular paper demonstrate performance improvements of up to 25x a
+fast AMD CPU on a challenging compression algorithm. FPGAs are a great target for data compression due to
+their hardware parallelism. We could potentially investigate adding data compression instructions to a RISC-V
+processor, in particular regarding zlib, bzip2 or zstd. The algorithm tested in \cite{Dongdong2022} seems to
+be too niche, and is complicated to accelerate compared to something like zlib or DEFLATE. We should also
+consider comparing whether an FPGA-SoC like Zynq, or processor with custom compression functions included, is
+faster. There is some existing literature on this concept: In \cite{Abali2020}, researchers from IBM
+demonstrate their hardware data compression accelerator for the taped-out IBM POWER9 processor. This circuit
+is designed into the main silicon of the chip, and the entire processor itself is manufactured on
+GlobalFoundries' 14nm process node. Their results indicate that the compressor circuit uses only 0.5\% chip 
+area, but can speed up zlib workloads 388x compared to a single IBM POWER9 core. This is extremely impressive, 
+as POWER9 is a modern, speculative out-of-order processor \cite{Sadasivam2017IBMPP}. 
+
+In terms of applying this concept to RISC-V processors, there is exceedingly little research. The only recent
+paper which does so was published by Google researchers in \cite{Karandikar2023}, in which, as part of their
+benchmarking suite, they introduce the concept of a "compression and decompression processing unit", or "CDPU".
+They develop a "CDPU" RTL generator in Chisel \cite{Chisel}, and extend the famous out-of-order BOOM core
+\cite{Asanovi2015TheBO} from Berkeley with their new CDPU. They report that their CDPU accelerator is 10x
+to 16x faster than a single Xeon core at various compression algorithms, including some new ones like zstd.
+If we were to implement a data compression accelerator, we would most certainly not be able to target anything
+this complicated. We could instead focus on simpler algorithms, such as Huffman coding or even just
+run-length encoding, to demonstrate the principle that compression can be accelerated in hardware.
+
+On the cybersecurity side of things, some interesting research in \cite{McKendrick2022} shows how reverse
+engineering FPGA bitstreams is rapidly progressing to be achievable. In this work, the authors were actually
+able to restore high-level HDL information just from a bitstream. This isn't particularly useful for my
+research - I just included it out of interest, since I imagine many manufacturers may have distributed 
+unencrypted bitstreams under the impression they were impossible to reverse engineer.
+
+\section{Industry trends}
+
+\section{Finalised research proposals}
+
+\section{References}
+\printbibliography[heading=none]
+
+\end{document}

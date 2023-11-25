@@ -10,3 +10,7 @@ papers: proposal
 # Generates thesis proposal document from LaTeX
 proposal:
 	@cd papers/proposal && {{LATEXMK_COMMAND}} proposal.tex
+
+# Generate lit review from LaTeX
+lit:
+    @cd papers/lit_review && {{LATEXMK_COMMAND}} litreview.tex

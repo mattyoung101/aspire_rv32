@@ -1,0 +1,90 @@
+@INPROCEEDINGS{McKendrick2022,
+
+  author={McKendrick, Reilly and Simpson, Corey and Nelson, Brent and Goeders, Jeffrey},
+
+  booktitle={2022 International Conference on Field-Programmable Technology (ICFPT)}, 
+
+  title={Leveraging FPGA Primitives to Improve Word Reconstruction during Netlist Reverse Engineering}, 
+
+  year={2022},
+
+  volume={},
+
+  number={},
+
+  pages={1-5},
+
+  doi={10.1109/ICFPT56656.2022.9974401}}
+
+@INPROCEEDINGS{Dongdong2022,
+  author={Tang, Dongdong and Sun, Xuan and Guan, Nan and Kuo, Tei-Wei and Xue, Chun Jason},
+  booktitle={2022 International Conference on Field-Programmable Technology (ICFPT)}, 
+  title={$p$LPAQ: Accelerating LPAQ Compression on FPGA}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={1-6},
+  doi={10.1109/ICFPT56656.2022.9974593}}
+
+@INPROCEEDINGS{Abali2020,
+  author={Abali, Bulent and Blaner, Bart and Reilly, John and Klein, Matthias and Mishra, Ashutosh and Agricola, Craig B. and Sendir, Bedri and Buyuktosunoglu, Alper and Jacobi, Christian and Starke, William J. and Myneni, Haren and Wang, Charlie},
+  booktitle={2020 ACM/IEEE 47th Annual International Symposium on Computer Architecture (ISCA)}, 
+  title={Data Compression Accelerator on IBM POWER9 and z15 Processors : Industrial Product}, 
+  year={2020},
+  volume={},
+  number={},
+  pages={1-14},
+  doi={10.1109/ISCA45697.2020.00012}}
+
+@article{Sadasivam2017IBMPP,
+  title={IBM Power9 Processor Architecture},
+  author={Satish Kumar Sadasivam and Brian W. Thompto and Ronald N. Kalla and William J. Starke},
+  journal={IEEE Micro},
+  year={2017},
+  volume={37},
+  pages={40-51},
+  url={https://api.semanticscholar.org/CorpusID:31208323}
+}
+
+@inproceedings{Karandikar2023,
+author = {Karandikar, Sagar and Udipi, Aniruddha N. and Choi, Junsun and Whangbo, Joonho and Zhao, Jerry and Kanev, Svilen and Lim, Edwin and Alakuijala, Jyrki and Madduri, Vrishab and Shao, Yakun Sophia and Nikolic, Borivoje and Asanovic, Krste and Ranganathan, Parthasarathy},
+title = {CDPU: Co-Designing Compression and Decompression Processing Units for Hyperscale Systems},
+year = {2023},
+isbn = {9798400700958},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3579371.3589074},
+doi = {10.1145/3579371.3589074},
+abstract = {General-purpose lossless data compression and decompression ("(de)compression") are used widely in hyperscale systems and are key "datacenter taxes". However, designing optimal hardware compression and decompression processing units ("CDPUs") is challenging due to the variety of algorithms deployed, input data characteristics, and evolving costs of CPU cycles, network bandwidth, and memory/storage capacities.To navigate this vast design space, we present the first large-scale data-driven analysis of (de)compression usage at a major cloud provider by profiling Google's datacenter fleet. We find that (de)compression consumes 2.9\% of fleet CPU cycles and 10--50\% of cycles in key services. Demand is also artificially limited; 95\% of bytes compressed in the fleet use less capable algorithms to reduce compute, motivating a CDPU that changes cost vs. size tradeoffs.Prior work has improved the microarchitectural state-of-the-art for CDPUs supporting various algorithms in fixed contexts. However, we find that higher-level design parameters like CDPU placement, hash table sizing, history window sizes, and more have as significant of an impact on the viability of CDPU integration, but are not well-studied. Thus, we present the first end-to-end design/evaluation framework for CDPUs, including: 1. An open-source RTL-based CDPU generator that supports many run-time and compile-time parameters. 2. Integration into an open-source RISC-V SoC for rapid performance and silicon area evaluation across CDPU placements and parameters. 3. An open-source (de)compression benchmark, HyperCompressBench, that is representative of (de)compression usage in Google's fleet.Using our framework, we perform an extensive design space exploration running HyperCompressBench. Our exploration spans a 46\texttimes{} range in CDPU speedup, 3\texttimes{} range in silicon area (for a single pipeline), and evaluates a variety of CDPU integration techniques to optimize CDPU designs for hyperscale contexts. Our final hyperscale-optimized CDPU instances are up to 10\texttimes{} to 16\texttimes{} faster than a single Xeon core, while consuming a small fraction (as little as 2.4\% to 4.7\%) of the area.},
+booktitle = {Proceedings of the 50th Annual International Symposium on Computer Architecture},
+articleno = {39},
+numpages = {17},
+keywords = {hyperscale systems, warehouse-scale computing, compression, hardware-acceleration, profiling, decompression},
+location = {Orlando, FL, USA},
+series = {ISCA '23}
+}
+
+@inproceedings{Chisel,
+author = {Bachrach, Jonathan and Vo, Huy and Richards, Brian and Lee, Yunsup and Waterman, Andrew and Avi\v{z}ienis, Rimas and Wawrzynek, John and Asanovi\'{c}, Krste},
+title = {Chisel: Constructing Hardware in a Scala Embedded Language},
+year = {2012},
+isbn = {9781450311991},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2228360.2228584},
+doi = {10.1145/2228360.2228584},
+abstract = {In this paper we introduce Chisel, a new hardware construction language that supports advanced hardware design using highly parameterized generators and layered domain-specific hardware languages. By embedding Chisel in the Scala programming language, we raise the level of hardware design abstraction by providing concepts including object orientation, functional programming, parameterized types, and type inference. Chisel can generate a high-speed C++-based cycle-accurate software simulator, or low-level Verilog designed to map to either FPGAs or to a standard ASIC flow for synthesis. This paper presents Chisel, its embedding in Scala, hardware examples, and results for C++ simulation, Verilog emulation and ASIC synthesis.},
+booktitle = {Proceedings of the 49th Annual Design Automation Conference},
+pages = {1216–1225},
+numpages = {10},
+keywords = {CAD},
+location = {San Francisco, California},
+series = {DAC '12}
+}
+
+@inproceedings{Asanovi2015TheBO,
+  title={The Berkeley Out-of-Order Machine (BOOM): An Industry-Competitive, Synthesizable, Parameterized RISC-V Processor},
+  author={Krste Asanovi{\'c} and David A. Patterson and Christopher Celio},
+  year={2015},
+  url={https://api.semanticscholar.org/CorpusID:16283995}
+}

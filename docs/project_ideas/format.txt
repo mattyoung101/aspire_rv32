@@ -1,0 +1,4 @@
+Title: Project title
+Abstract: Project abstract
+Discussion: Talk candidly about pros/cons, background literature, what I personally think about the project.
+Conclusion: Keep/discard
