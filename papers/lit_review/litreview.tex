@@ -17,13 +17,13 @@
 %\renewcommand{\familydefault}{\sfdefault}
 
 % https://www.overleaf.com/learn/latex/Page_size_and_margins
-% \usepackage{geometry}
-% \geometry{
-% 	a4paper,
-% 	total={170mm,257mm},
-% 	left=20mm,
-% 	top=20mm,
-% }
+\usepackage{geometry}
+\geometry{
+	a4paper,
+	total={170mm,257mm},
+	left=20mm,
+	top=20mm,
+}
 
 % package instantiation
 \MakeOuterQuote{"}
@@ -92,7 +92,7 @@ The specific topics we will look into are:
     \item Applications of custom processors and/or RISC-V in cybersecurity
 \end{itemize}
 
-Additionally, we will have a look at what the latest is in the following journals:
+These topics will primarily be sourced from the latest editions of the following journals:
 \begin{itemize}
     \item IEEE International Conference on Field-Programmable Technology (FPT)
     \item Annual IEEE Symposium on Field-Programmable Custom Computing Machines (FCCM) 
@@ -109,7 +109,7 @@ literature review, then, is to see which of these ideas are reasonable, as well 
 which I might not have considered yet. Once this is done, we will end up with a list of research questions
 which meet all the relevant criteria for my thesis!
 
-\section{Initial ideas from me}
+\section{Initial ideas}
 The following section details various paper ideas I've had over the last few years. The goal is to lay
 these out first, and then evaluate if they hold up to scrutiny as actually good ideas by performing the
 literature review. The ideas appear in the order of how much I think they are a reasonable project, with
@@ -299,6 +299,8 @@ is machine learning. Although DSP remains an incredibly important workload for F
 learning is being added to more and more devices, so will become an increasingly important workload as
 years go on. Already, we've seen manufacturers like Xilinx offer AI-tuned SoCs and IP cores.
 
+\subsubsection{Data compression}
+
 Other workloads that remain popular for FPGA acceleration include data compression, as shown in
 \cite{Dongdong2022}. The authors in this particular paper demonstrate performance improvements of up to 25x a
 fast AMD CPU on a challenging compression algorithm. FPGAs are a great target for data compression due to
@@ -321,13 +323,92 @@ They develop a "CDPU" RTL generator in Chisel \cite{Chisel}, and extend the famo
 to 16x faster than a single Xeon core at various compression algorithms, including some new ones like zstd.
 If we were to implement a data compression accelerator, we would most certainly not be able to target anything
 this complicated. We could instead focus on simpler algorithms, such as Huffman coding or even just
-run-length encoding, to demonstrate the principle that compression can be accelerated in hardware.
+run-length encoding, to demonstrate the principle that compression can be accelerated in hardware. This topic
+would yield pretty good results, however, it unfortunately misses out on the processor \textit{design}, as we
+would most likely be using someone else's RISC-V core and just adding a compression accelerator to it.
 
-On the cybersecurity side of things, some interesting research in \cite{McKendrick2022} shows how reverse
-engineering FPGA bitstreams is rapidly progressing to be achievable. In this work, the authors were actually
-able to restore high-level HDL information just from a bitstream. This isn't particularly useful for my
-research - I just included it out of interest, since I imagine many manufacturers may have distributed 
-unencrypted bitstreams under the impression they were impossible to reverse engineer.
+\subsubsection{Course Grained Reconfigurable Architectures (CGRAs)}
+
+One new area of research in reconfigurable computing is called a "course grained reconfigurable architecture", or
+CGRA. The goal of a CGRA, compared to an FPGA, is to significantly improve performance at the cost of the
+granularity of reconfiguration. Compared to today's FPGAs, which almost exclusively use SRAM-based lookup tables
+(LUTs) and a reconfigurable fabric, CGRAs are a newer and less standardised technology, so there is not one
+simple general CGRA architecture that can be pointed to. In \cite{Podobas2020}, the authors perform an
+extremely detailed literature review of existing CGRA designs. They state that modern CGRAs typically consist
+of a number of functional units, each which contain an ALU, possibly a multiplier, and a register file. These
+FUs are then networked together in a reconfigurable mesh, similar to an FPGA. When techmapping an algorithm 
+onto a CGRA processor, typically the innermost loop of the algorithm will be selected. This works extremely 
+well for DSP-style applications, such as IIR filters or FFTs. (TODO cite that VLIW paper/book)
+However, as stated in \cite{asuCoarseGrainedReconfigurable} and \cite{umichCCCPCoarseGrained}, this process is
+extremely complex and time consuming for the compiler, as mapping the algorithm's Data Dependency Graph onto
+the target CGRA is NP-complete.
+
+CGRAs specifically came to my attention because of the article \cite{Boma2022} published in the FPT journal.
+In this paper, the authors propose several CGRA architectures to reduce connections across what they call
+switch blocks. They also analyse the hardware cost and routability of various data-flow graphs, to see how
+algorithms would map onto the proposed CGRA. 
+
+While CGRAs are extremely interesting, they may not be the best topic of research for this particular thesis.
+Designing a CGRA would be a very interesting research topic, however, it would require a VLSI workflow and even
+possibly a tapeout to see genuine performance gains. Like other digital circuits, it's entirely possible to
+prototype it on an FPGA, however, the performance degradation will be significant. Without a VLSI flow, which
+is not currently available at UQ, we would only be able to determine expected performance improvements based
+on RTL simulation. Since CGRAs are relatively cutting-edge, acquiring the necessary skills to develop a novel
+CGRA implementation would also be difficult. With all that said, CGRAs are certainly an interesting topic for
+future research.
+
+\subsubsection{Dataflow architectures}
+
+\subsubsection{Approximate computing}
+
+\subsubsection{SLAM}
+
+Simultaneous localisation and mapping, or SLAM, is a very important technique in robotics for both determining
+the robots current position ("localisation") and producing either a 2D or 3D model of the environment
+("mapping"). SLAM algorithms can be run on vision, LiDAR, radar and other sensors. Because of the pattern
+matching and linear algebra involved in SLAM algorithms, they can be rather expensive to run. Currently, as of
+writing, I'm employed as an intern at Emesent, a robotics company which produces Hovermap, a leading drone-based
+GPS-denied 3D LiDAR scanning platform. We use an extremely powerful SLAM algorithm called Wildcat \cite{ramezani2022wildcat}, 
+originally developed at CSIRO. Although Wildcat makes use of efficient linear algebra
+primitives, running the algorithm on the embedded compute of the Hovermap payload can still present a
+challenge. I have often thought that using a Zynq SBC and offloading some of the SLAM work to an FPGA might be
+able to improve performance. In \cite{Vemulapati2022}, the authors develop "FSLAM", an FPGA accelerated
+implementation of the ORB-SLAM visual SLAM algorithm. They report that their implementation is 8.5x faster
+than an ARM CPU, and 1.55x faster than an "Intel desktop CPU" \footnote{Somewhat annoyingly, the authors do
+not state what specific CPU this is except for it being an Intel i5. We can presume it's a modern OoO x86
+core.}. In table IV in the paper, their FPGA implementation achieves 62 FPS and draws only 4.6W of power.
+Although the desktop GPU implementation is the fastest, at 70 FPS, it draws 200W of power (!)
+
+Overall, this SLAM accelerator idea is a very interesting research topic. I have thought about whether
+processor designs optimised for DSP, such as VLIW processors, would be applicable for SLAM acceleration. 
+Realistically, although more performance might be gained out of a specialised processor, for LiDAR SLAM
+acceleration, you would want to use an FPGA, as porting Wildcat plus all the libraries it uses to RISC-V would
+be extremely challenging. In addition, the existing implementation \textit{likely} uses x86 SIMD instructions,
+which almost certainly yield more performance than the RISC-V vector extension. The better way to extract more
+performance would be adding specialised hardware units for direct point cloud feature extraction and using
+DMA. Even on an FPGA SoC like a Zynq, with extensive use of DMA and even PCI-Express interconnect, there is
+still no guarantee that memory wouldn't be the bottleneck and we would receive worse performance than keeping
+it within the CPU. We would probably need some extensive caching mechanism to achieve decent performance.
+
+% In addition, with my employment at Emesent, we could probably do this project in collaboration with them. The
+% only limitations are that, in table II in the paper, it uses a massive 76,000 LUTs and 101,000 FFs, which is
+% far too big to fit on my Lattice ECP5 FPGA. Additionally, my knowledge about LiDAR SLAM is limited. In
+% \cite{Vemulapati2022}, the authors accelerate ORB-SLAM by specifically accelerating the ORB feature descriptor
+% in hardware. I don't know what feature descriptors, if any, Wildcat uses. The
+% final challenge is that, given the enormous memory bandwidth required, the resulting FPGA implementation be
+% slower, and finally, that this project is more of an FPGA-style project than processor design. 
+
+I work with the lead developer of Wildcat, so I can ask him the possibility of
+accelerating it using an FPGA and how realistic of a proposal that is. If this does end up being a good idea,
+using my employment at Emesent, we could probably do this project in collaboration with them.
+
+% \subsubsection{Cybersecurity}
+%
+% On the cybersecurity side of things, some interesting research in \cite{McKendrick2022} shows how reverse
+% engineering FPGA bitstreams is rapidly progressing to be achievable. In this work, the authors were actually
+% able to restore high-level HDL information just from a bitstream. This isn't particularly useful for my
+% research - I just included it out of interest, since I imagine many manufacturers may have distributed 
+% unencrypted bitstreams under the impression they were impossible to reverse engineer.
 
 \section{Industry trends}
 
