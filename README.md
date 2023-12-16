@@ -1,16 +1,19 @@
-# "TBA" - RISC-V RV32 CPU
-"TBA" is a RISC-V CPU, designed in SystemVerilog, that implements the RV32IC instruction set architecture.
-The project will (hopefully) be started in Semester 2 2024, as part of my Bachelor of Computer Science (Honours)
-thesis at the University of Queensland.
+# Aspire - A RISC-V RV32 Processor
+_Aspire_ is a RISC-V CPU, designed in SystemVerilog, that implements the RV32IC_Zmmul_Zicsr instruction set
+architecture. The project will (hopefully) be started in Semester 2 2024, as part of my Bachelor of Computer
+Science (Honours) thesis at the University of Queensland.
 
-Jelly is designed, verified and synthesised entirely by me, from scratch, using only open-source tools.
+Aspire is designed, verified and synthesised entirely by me, from scratch, using only open-source tools.
 
 **Author:** Matt Young (m.young2@uqconnect.edu.au)
 
 ## Features
-- Implements RISC-V RV32IC ISA (base + "C" Compressed Instructions extension)
-- Written in SystemVerilog
-- Synthesisable for Lattice ECP5 FPGA and theoretically VLSI
+- TBA
+- Implements RV32IC_Zmmul_Zicsr ISA
+    - Features a single single 32-bit multiplier
+- Hardware UART TX peripheral (115200 baud, 8 bit word size, 1 stop bit, no parity)
+   - Based on this upstream project: https://github.com/medalotte/SystemVerilog-UART (MIT licence)
+   - Minor in-house modifications to simplify
 
 ## Getting started with "TBA"
 ### Setting up the toolchain
@@ -28,10 +31,11 @@ In any case, they're both equivalent, as long as you're using the bleeding edge 
 
 **Verification tools**
 
-You need a C++ compiler that supports C++20. I use Clang 16. You also need CMake, Verilator, GTKWave and Icarus
-Verilog.
+You need a C++ compiler that supports C++20. I use Clang 16. You also need CMake, Verilator, GTKWave, Icarus
+Verilog, Sigrok and Pulseview.
 
-All of these are in the regular Arch repos: `yay -S clang verilator gtkwave iverilog`
+All of these are in the regular Arch repos: `yay -S cmake clang verilator gtkwave iverilog sigrok-cli
+pulseview`
 
 **Generating papers**
 
@@ -63,6 +67,47 @@ You can use the `Justfile` to generate PDFs from the TeX sources. Just run
 Make sure you have the necessary dependencies as described in Setting up the toolchain.
 
 ## Licence
-SystemVerilog code: Mozilla Public License v2.0 (TODO probably, would need to check with UQ)
+SystemVerilog code: (TODO check with UQ, one of MPL 2.0 or Apache)
 
-Paper: TODO something (CC-BY-SA? Again check with UQ)
+Paper: TODO check with UQ, hopefully CC-BY or something?
+
+The RTL will most likely initially be released under the Mozilla Public License v2.0, a nice hybrid
+permissive-copyleft licence. However, there are already a gazillion RISC-V implementations out there in the
+wild, so it may be better to keep the licence simple and permissive, like the Apache 2.0. I'm still
+considering. Might also consider even more lax licences like the 0BSD.
+
+As a UQ student, I may also be subject to the university's whims regarding licencing and IP. I will need to
+check that I am legally the sole owner of this project's IP and can open source it before doing so. To the
+best of my knowledge, as an honours student I am able to keep my IP, but this needs thorough checking.
+
+I'm planning to release the paper LaTeX sources under CC-BY, but I need to check with the uni's academic
+integrity policy to make sure this is allowed. I'm also hoping to convert this thesis into a paper and publish
+in an open access journal like IEEE Access, or at least arXiv.
+
+---
+
+```
+        ##                                                      
+     /####                              #                       
+    /  ###                             ###                      
+       /##                              #                       
+      /  ##                                                     
+      /  ##          /###      /###   ###   ###  /###     /##   
+     /    ##        / #### /  / ###  / ###   ###/ #### / / ###  
+     /    ##       ##  ###/  /   ###/   ##    ##   ###/ /   ### 
+    /      ##     ####      ##    ##    ##    ##       ##    ###
+    /########       ###     ##    ##    ##    ##       ######## 
+   /        ##        ###   ##    ##    ##    ##       #######  
+   #        ##          ### ##    ##    ##    ##       ##       
+  /####      ##    /###  ## ##    ##    ##    ##       ####    /
+ /   ####    ## / / #### /  #######     ### / ###       ######/ 
+/     ##      #/     ###/   ######       ##/   ###       #####  
+#                           ##                                  
+ ##                         ##                                  
+                            ##                                  
+                             ##                                 
+                                                                
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~                                            
+                     ~~ THE DESIRE TO SUCCEED ~~       
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

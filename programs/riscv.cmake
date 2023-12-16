@@ -8,6 +8,10 @@
 
 message(STATUS "LLVM home: $ENV{RISCV_LLVM_HOME}")
 
+if("$ENV{RISCV_LLVM_HOME}" STREQUAL "")
+    message(FATAL_ERROR "You must set the environment variable RISCV_LLVM_HOME to a RISC-V RV32 ilp32 ABI toolchain.")
+endif()
+
 # Look for RISC-V GNU toolchain clang
 # https://github.com/riscv/riscv-gnu-toolchain
 find_program(RISCV_LLVM_COMPILER "$ENV{RISCV_LLVM_HOME}/bin/riscv32-unknown-elf-clang" REQUIRED)
@@ -37,7 +41,6 @@ set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 #CMAKE_FORCE_CXX_COMPILER( "${RISCV_TOOLCHAIN_BIN_PATH}/${CROSS_COMPILE}g++${RISCV_TOOLCHAIN_BIN_EXT}" GNU )
 set(CMAKE_ASM_COMPILER "${RISCV_TOOLCHAIN_BIN_PATH}/${CROSS_COMPILE}clang")
 set(CMAKE_AR "${RISCV_TOOLCHAIN_BIN_PATH}/llvm-ar")
-set(CMAKE_ASM_COMPILER "${RISCV_TOOLCHAIN_BIN_PATH}/${CROSS_COMPILE}clang")
 set(CMAKE_C_COMPILER "${RISCV_TOOLCHAIN_BIN_PATH}/${CROSS_COMPILE}clang")
 set(CMAKE_CXX_COMPILER "${RISCV_TOOLCHAIN_BIN_PATH}/${CROSS_COMPILE}clang++")
 
