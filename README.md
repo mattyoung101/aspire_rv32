@@ -10,12 +10,13 @@ Aspire is designed, verified and synthesised entirely by me, from scratch, using
 ## Features
 - TBA
 - Implements RV32IC_Zmmul_Zicsr ISA
-    - Features a single single 32-bit multiplier
+    - Features a single cycle 32x32-bit multiplier, 64-bit result, both signed/unsigned
+    - (Maybe) Supports `clz` from Zbb (no other instructions from that extension though)
 - Hardware UART TX peripheral (115200 baud, 8 bit word size, 1 stop bit, no parity)
    - Based on this upstream project: https://github.com/medalotte/SystemVerilog-UART (MIT licence)
    - Minor in-house modifications to simplify
 
-## Getting started with "TBA"
+## Getting started with Aspire
 ### Setting up the toolchain
 I'm going to assume you use Arch, because that's what I use (sorry). If you use another distro like Ubuntu, 
 the same instructions still apply, but you might have to build some packages from source - Ubuntu ships 
