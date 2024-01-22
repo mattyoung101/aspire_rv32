@@ -1,27 +1,5 @@
 `default_nettype none
-//`include "util.sv"
-
-// move this to some sort of header utils file
-`ifdef VERILATOR
-`define PANIC(msg) $error(msg)
-`else
-`define PANIC(msg)
-`endif
-
-typedef enum {
-    ALU_ADD, // Signed addition
-    ALU_SLL, // Shift left logical
-    ALU_XOR, // XOR
-    ALU_SRL, // Shift right logical
-    ALU_SRA, // Shift right arithmetic
-    ALU_OR,  // Logical OR
-    ALU_AND, // Logical AND
-    ALU_SUB, // Signed subtraction
-    ALU_MULS_LO, // Signed multiplication [lower 31:0]
-    ALU_MULS_HI, // Signed multiplication [upper 63:32]
-    ALU_MULU_LO, // Unsigned multiplication [lower 31:0]
-    ALU_MULU_HI // Unsigned multiplication [upper 63:32]
-} ALUOp_t;
+`include "util.sv"
 
 // This module implements Aspire's ALU. This ALU is implemented purely combinatorially. There's also W, the
 // word size (XLEN), which is always 32 for this processor but can be reconfigured "just in case".
@@ -47,7 +25,10 @@ module alu # (
             ALU_ADD: o_out = $signed(i_a) + $signed(i_b); // TODO consider signed' cast?
             ALU_SUB: o_out = $signed(i_a) - $signed(i_b);
 
-            // Shifts
+            // Shifts (TODO do these need to be signed)
+            ALU_SLL: o_out = i_a << i_b;
+            ALU_SRL: o_out = i_a >>> i_b;
+            ALU_SRA: o_out = i_a >> i_b;
 
             // Bitwise
             ALU_XOR: o_out = i_a ^ i_b;

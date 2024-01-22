@@ -8,10 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "coremark.h"
-#define USEMCYCLE
-#ifndef USEMCYCLE
-#include "simulatorIntercepts.h"
-#endif
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -53,16 +49,11 @@
 //#define GETMYTIME(_t) (*_t=clock())
 //#define CORETIMETYPE ee_u32
 
-#ifndef USEMCYCLE
-//Using Imperas Intercepts
-#define GETMYTIME(_t) (*_t=impProcessorInstructionCount())
-#else
 // Using mcycle register
 #define read_csr(reg) ({ unsigned long __tmp; \
   asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
   __tmp; })
 #define GETMYTIME(_t) (*_t=read_csr(mcycle))
-#endif
 
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1

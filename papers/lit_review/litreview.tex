@@ -258,15 +258,15 @@ performance metrics are analysed.
 \textbf{Verdict:} This is an interesting question, but it may be hard both be hard to implement, and we
 may not see any real power savings. It also may not make sense to do for a microcontroller style CPU anyway.
 
-\subsection{Design and implementation of a low-power RISC-V RV32IC processor}
-\textbf{Abstract:} With the ever increasing number of battery-powered smart devices in the world today,
-low-power processor design is becoming a very active field in computer architecture research. Traditionally,
-architectures like Arm and MIPS have been the main targets of low-power designs - yet, in recent years, the
-open-source RISC-V architecture has become a driving force in the industry. In this thesis, I design a
-low-power RISC-V RV32ICM processor by exploring common low-power design methodologies used in industry and
-research. The resulting design is synthesised for the Lattice ECP5 FPGA using open-source tools, and is
-extensively benchmarked, both for power and performance. I show how details like pipeline depth and ALU design
-can create interesting trade-offs between a processor's performance and its power consumption.
+% \subsection{Design and implementation of a low-power RISC-V RV32IC processor}
+% \textbf{Abstract:} With the ever increasing number of battery-powered smart devices in the world today,
+% low-power processor design is becoming a very active field in computer architecture research. Traditionally,
+% architectures like Arm and MIPS have been the main targets of low-power designs - yet, in recent years, the
+% open-source RISC-V architecture has become a driving force in the industry. In this thesis, I design a
+% low-power RISC-V RV32ICM processor by exploring common low-power design methodologies used in industry and
+% research. The resulting design is synthesised for the Lattice ECP5 FPGA using open-source tools, and is
+% extensively benchmarked, both for power and performance. I show how details like pipeline depth and ALU design
+% can create interesting trade-offs between a processor's performance and its power consumption.
 
 % This literally makes no sense to do with a microcontroller. We should wait until we have the capability
 % to tape out an actual RV64GC SoC.
@@ -281,6 +281,8 @@ can create interesting trade-offs between a processor's performance and its powe
 % Basically ARM big.LITTLE but for risc-v
 
 % TODO IDEA: comparing performance & power of DSP workloads with and without hardware multiply
+
+% \subsection{An approximate computing extension for RISC-V}
 
 \section{Literature reviews}
 This brief literature review aims to determine what the latest research in both reconfigurable computing
@@ -360,11 +362,31 @@ future research.
 \subsubsection{Dataflow architectures}
 
 \subsubsection{Approximate computing}
+%
+% - Integrate approx computing (e.g. approx add) with RISC-V??
+% - Like an approximate ALU
 
-- Integrate approx computing (e.g. approx add) with RISC-V??
-- Like an approximate ALU
+Recently, the concept of approximate computing has emerged and become an actively researched topic in computer
+engineering. One upcoming industry trend is the deployment of neural network machine learning models to edge
+computing devices, such as smart cameras or home assistants. The perceptron model that these neural networks
+are based on does not need particularly accurate computing requirements in order to function with a high
+degree of similarity to full-precision models. Currently, most machine learning frameworks such as Tensorflow
+and PyTorch offer the ability to heavily quantise the neuron weights, for example to an 8-bit fixed point
+format. This means that many pieces of machine learning hardware such as Google's Tensor Processing Units
+(TPUs) are optimised for large scale, low precision arithmetic. However, with approximate computing, this
+quantisation can be made more efficient. Approximate adders and multipliers, which use less power and area
+than their full-precision counterparts, can be combined with quanitisation to produce extremely efficient edge
+computing hardware capable of executing the latest machine learning models quickly while drawing minimal
+power.
 
-Recently, the concept of approximate computing has emerged and become particularly relevant to FPGAs.
+The RISC-V ISA is an excellent platform to extend with approximate computing extensions. There already exist a
+number of RISC-V machine learning accelerators, and these could be further improved by designing and
+implementing an approximate computing extension. This may have applications not just in machine learning, but
+also possibly in fields where high-volume, low-precision compute is required, such as certain types of 
+embedded DSP. We could design a processor that has a particular register, or perhaps a custom instruction,
+that switches from a precise ALU to an approximate ALU. Alternatively, we could add an additional set of
+instructions for the RISC-V ISA that uses approximate computing, so that precise and approximate arithmetic
+can be mixed.
 
 \subsubsection{SLAM}
 

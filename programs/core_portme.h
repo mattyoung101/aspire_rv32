@@ -16,7 +16,8 @@
 	Define to 1 if the platform supports floating point.
 */
 #ifndef HAS_FLOAT 
-#define HAS_FLOAT 1
+//#define HAS_FLOAT 1
+#define HAS_FLOAT 0
 #endif
 /* Configuration : HAS_TIME_H
 	Define to 1 if platform has the time.h header file,
@@ -101,8 +102,7 @@ typedef size_t ee_size_t;
 	SEED_VOLATILE - from volatile variables.
 */
 #ifndef SEED_METHOD
-//#define SEED_METHOD SEED_VOLATILE
-#define SEED_METHOD SEED_ARGV
+#define SEED_METHOD SEED_VOLATILE
 #endif
 
 /* Configuration : MEM_METHOD
@@ -114,8 +114,7 @@ typedef size_t ee_size_t;
 	MEM_STACK - to allocate the data block on the stack (NYI).
 */
 #ifndef MEM_METHOD
-//#define MEM_METHOD MEM_STACK
-#define MEM_METHOD MEM_MALLOC
+#define MEM_METHOD MEM_STATIC
 #endif
 
 /* Configuration : MULTITHREAD
@@ -134,7 +133,8 @@ typedef size_t ee_size_t;
 	to fit a particular architecture. 
 */
 #ifndef MULTITHREAD
-#define MULTITHREAD 1
+//#define MULTITHREAD 1
+#define MULTITHREAD 0
 #define USE_PTHREAD 0
 #define USE_FORK 0
 #define USE_SOCKET 0

@@ -1,11 +1,16 @@
 # Aspire - A RISC-V RV32 Processor
-_Aspire_ is a RISC-V CPU, designed in SystemVerilog, that implements the RV32IC_Zmmul_Zicsr instruction set
-architecture. The project will (hopefully) be started in Semester 2 2024, as part of my Bachelor of Computer
-Science (Honours) thesis at the University of Queensland.
+_Aspire_ is a RISC-V CPU designed for my Bachelor of Computer Science (Honours) thesis project at
+the University of Queensland. The title of the thesis is,
+"A triple modular redundancy fault tolerant RISC-V processor for safety-critical applications".
 
-Aspire is designed, verified and synthesised entirely by me, from scratch, using only open-source tools.
+Aspire is designed in SystemVerilog, and implements the RV32IC_Zmmul_Zicsr instruction set
+architecture. The processor uses triple-modular redundancy (TMR) to prevent single-event upsets (SEUs),
+making it potentially useful in safety-critical and rad-hardened applications. Particular industry
+areas where the processor may be useful include space, defence, medical and automotive.
 
-**Author:** Matt Young (m.young2@uqconnect.edu.au)
+**Disclaimer:** Although intended for safety-critical applications, Aspire is a thesis project and
+is not certified or audited in any capacity. There is no warranty, and I make no guarantees of 
+correctness. Please carefully consider if these factors make Aspire suitable for your use-case.
 
 ## Features
 - TBA
@@ -14,7 +19,10 @@ Aspire is designed, verified and synthesised entirely by me, from scratch, using
     - (Maybe) Supports `clz` from Zbb (no other instructions from that extension though)
 - Hardware UART TX peripheral (115200 baud, 8 bit word size, 1 stop bit, no parity)
    - Based on this upstream project: https://github.com/medalotte/SystemVerilog-UART (MIT licence)
-   - Minor in-house modifications to simplify
+   - Minor in-house modifications to simplify it (removed RX, etc)
+   - Not currently software reconfigurable, i.e., config (including baud rate!) is fixed in hardware
+- (Extension) GPIO
+    - Based on (TODO upstream)
 
 ## Getting started with Aspire
 ### Setting up the toolchain
@@ -25,7 +33,7 @@ a Docker to make this all less of a PITA.
 
 **Synthesis tools**
 
-You need Yosys and nextpnr-ecp5. Get the nightlies from the AUR: `yay -S yay -S yosys-nightly nextpnr-ecp5-nightly`
+You need Yosys and nextpnr-ecp5. Get the nightlies from the AUR: `yay -S yosys-nightly nextpnr-ecp5-nightly`
 
 The nightly PKGBUILDS are maintained by a Yosys developer, so they might work better than just the -git ones.
 In any case, they're both equivalent, as long as you're using the bleeding edge versions of both.
