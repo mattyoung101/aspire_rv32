@@ -73,6 +73,9 @@ You can use the `Justfile` to generate PDFs from the TeX sources. Just run
 `just papers` to generate them all, `just proposal` for the proposal, `just thesis` for the thesis. Try
 `just --list` to display all targets. This uses `latexmk` internally.
 
+If you install inotify-tools using `yay -S inotifytools`, the `watchpapers.sh` script will automatically
+recompile papers using `inotifywait` when they are modified.
+
 Make sure you have the necessary dependencies as described in Setting up the toolchain.
 
 ## Licence

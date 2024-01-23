@@ -1,3 +1,9 @@
+### FIXME WE MAY HAVE TO MOVE BACK TO GCC
+Clang doesn't support specs so we can't do `--specs=nosys.specs` and `--specs=nano.specs`. Our options are
+either to switch back to GCC, or go the full `-nostdlib` approach and implement memcpy and everything
+from the upstream riscv-tests repo. We can do this, but the question is why? Is it better to just use the
+stdlib?
+
 ## Programs directory
 This directory contains various test programs for the processor. There are a few basic test programs, as well as
 CoreMark, which is the main target program of this processor. I also want SPEC CPU 2017, but it costs money :( 

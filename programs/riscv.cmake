@@ -30,7 +30,9 @@ message("RISC-V cross compile: ${CROSS_COMPILE}")
 # The Generic system name is used for embedded targets (targets without OS) in
 # CMake
 set(CMAKE_SYSTEM_NAME       Generic)
-set(CMAKE_SYSTEM_PROCESSOR  rv32ic_zmmul_zicsr)
+# FIXME: We want to use "rv32ic_zmmul_zicsr", but clangd has issues, see: 
+# https://lore.kernel.org/linux-patches/20230328142608.297531169@linuxfoundation.org/
+set(CMAKE_SYSTEM_PROCESSOR  rv32ic_zmmul)
 set(ABI                     "ilp32")
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 
@@ -64,8 +66,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "")
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "")
 set(CMAKE_EXE_LINKER_FLAGS   "${CMAKE_EXE_LINKER_FLAGS} -march=${CMAKE_SYSTEM_PROCESSOR}")
 
-# Use mold for now, LLD has a bug: https://www.mail-archive.com/llvm-bugs@lists.llvm.org/msg67576.html
-# Mold links successfully and is MIT licenced
-add_link_options("-fuse-ld=mold")
+# FIXME cannot use LLD due to a bug: https://www.mail-archive.com/llvm-bugs@lists.llvm.org/msg67576.html
+# Mold cannot be used either due to its lack of linker script support. We are forced to use GCC.
 
 message(STATUS "End of riscv.cmake")
