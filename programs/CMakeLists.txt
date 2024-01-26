@@ -76,23 +76,16 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 # Link options
-# TODO linker script
-# TODO do we want -nostdlib -nostartfiles?
-
-# target_link_options(coremark PRIVATE -Wl,--gc-sections,--print-memory-usage,-Map=coremark.map)
-# target_link_options(coremark PRIVATE -Wl,--specs=nano.specs)
-# add_link_options(--specs=nano.specs)
-# add_link_options(--specs=nosys.specs)
-
-# set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections,--print-memory-usage,-Map=coremark.map -Wl,--specs=nano.specs")
-
-#target_link_options(coremark PRIVATE "-lnosys")
-
 target_link_options(coremark PRIVATE -nostdlib -nostartfiles -lgcc -T ${CMAKE_SOURCE_DIR}/lib/test.ld)
 target_link_libraries(coremark PRIVATE gcc)
 
 target_link_options(hello_world PRIVATE -nostdlib -nostartfiles -lgcc -T ${CMAKE_SOURCE_DIR}/lib/test.ld)
 target_link_libraries(hello_world PRIVATE gcc)
+
+# Garbage collect unused sections
+# FIXME print memory usage not working
+SET(CMAKE_EXE_LINKER_FLAGS 
+"${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections,--print-gc-sections,--print-memory-usage")
 
 # # Post processing command to create a hex file 
 # add_custom_command(TARGET ${TARGET}.elf POST_BUILD

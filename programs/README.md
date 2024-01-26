@@ -1,9 +1,3 @@
-### FIXME WE MAY HAVE TO MOVE BACK TO GCC
-Clang doesn't support specs so we can't do `--specs=nosys.specs` and `--specs=nano.specs`. Our options are
-either to switch back to GCC, or go the full `-nostdlib` approach and implement memcpy and everything
-from the upstream riscv-tests repo. We can do this, but the question is why? Is it better to just use the
-stdlib?
-
 ## Programs directory
 This directory contains various test programs for the processor. There are a few basic test programs, as well as
 CoreMark, which is the main target program of this processor. I also want SPEC CPU 2017, but it costs money :( 
@@ -14,8 +8,6 @@ CoreMark, which is the main target program of this processor. I also want SPEC C
 You will need:
 - CMake 3.20+ 
 - Ninja
-- mold (linker)
-- and probably some RISC-V simulator, todo.
 
 On Arch you can install these using using: `yay -S cmake ninja mold spike clang lld llvm`
 
@@ -49,8 +41,7 @@ TODO: consider dockerizing this process
 
 For the linker, I was initially planning to use the LLD built into the RISC-V toolchain, but due to an
 [LLD bug](https://github.com/llvm/llvm-project/issues/64102) it appears it won't link modern RISC-V
-binutils. However, [mold](https://github.com/rui314/mold), which as of writing is now MIT licenced, is a good
-substitute and very fast.
+binutils. For the time being, we are forced to use GNU ld.
 
 ## Building the programs
 Now that we've built an LLVM RISC-V RV32IC ilp32 ABI toolchain (phew, mouthful), we can compile CoreMark.
@@ -59,31 +50,20 @@ just built. So in my case, it's `set -x RISCV_LLVM_HOME /home/matt/build/riscv-i
 
 Now you can just run `./build.sh` and CMake will take care of everything else.
 
-## Running in Spike
-As a test of the toolchain, we will run the test programs through the Spike emulator. Spike is packaged for
-Arch, just do `yay -S spike`. In order to boot the applications and use stdio, we'll need the proxy kernel.
-
-The proxy kernel needs to be built from source, which you can acquire from here: https://github.com/riscv-software-src/riscv-pk
-Then, execute the following in the riscv-pk directory:
-
-1. `mkdir build && cd build`
-2. Export `$RISCV` as the location of the built toolchain, in my case, `set -x RISCV ~/build/riscv-ilp32`
-3. Make sure that `$RISCV/bin` is in your path. I needed to do `set -x set -x PATH $RISCV/bin $PATH`. I would
-   not recommend doing this permanently, as it will override the system's `clang` binary.
-4. Run `../configure --prefix=$RISCV --host=riscv32-unknown-elf --with-arch=rv32ic_zmmul_zicsr_zifencei`
-5. Run `make -j$(nproc)`
-6. Run `make install` (no root required, just copies the binaries to the `$RISCV` directory)
-
-You can then run the binaries through Spike as follows:
-
-`spike --isa=rv32ic_zmmul_zicsr pk ./build/hello_world`
-
 ## Programs
 ### CoreMark
 The coremark repo is just a submodule to the upstream CoreMark. 
 
-The CoreMark port is courtesy of riscv-ovpsim: https://github.com/riscv-ovpsim/imperas-riscv-tests/tree/v20231026/riscv-ovpsim/examples/CoreMark
-and has some in-house modifications to correct behaviour for the Aspire processor.
+The CoreMark port is based on the baremetal example from the CoreMark repo. The contents of the `lib`
+directory is mainly taken from riscv-tests:
+https://github.com/riscv-software-src/riscv-tests/tree/master/benchmarks/common
+
+It's used to implement the low-level initialisation routines such as the CRT, linker script and various
+common routines like `memcpy` and `memset`.
+
+We could also use Newlib's implementation of all of the above using `nano.specs` and `nosys.specs`, but these
+specs files would require us to move to GCC. Plus, Newlib has a lot of overhead and if we can keep each binary
+<64K, including CoreMark, we get more BRAM space to dedicate to other things on the chip.
 
 ### Hello world
 This just prints some ASCII art in a loop as a base test.

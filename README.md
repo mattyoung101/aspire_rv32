@@ -21,6 +21,10 @@ correctness. Please carefully consider if these factors make Aspire suitable for
    - Based on this upstream project: https://github.com/medalotte/SystemVerilog-UART (MIT licence)
    - Minor in-house modifications to simplify it (removed RX, etc)
    - Not currently software reconfigurable, i.e., config (including baud rate!) is fixed in hardware
+- Watchdog timer
+    - 1 second timeout (not currently software reconfigurable)
+    - Can be reset by software
+    - If the timeout expires, the watchdog peripheral will trigger a hardware system reset automatically
 - (Extension) GPIO
     - Based on (TODO upstream)
 
@@ -60,13 +64,13 @@ If you want to modify the processor, you can use Neovim and my [Slingshot](https
 SystemVerilog LSP.
 
 ### Verifying the processor
-TBA
+TODO
 
 In the `programs` directory, there are some test programs that you can compile with Clang for the processor.
 There is a README in that directory explaining the process.
 
-### Synthesising the processor
-TBA
+### Synthesising and deploying the processor
+TODO
 
 ## Papers
 You can use the `Justfile` to generate PDFs from the TeX sources. Just run

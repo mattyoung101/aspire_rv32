@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdint.h>
 #include "aspire.h"
 
@@ -28,7 +27,6 @@
 "								 \n" \
 "								 \n" \
 "      * (c) 2024, 2025 Matt Young. University of Queensland. *  \n" \
-"      * Available under the (LICENCE HERE).                  *  \n" \
 
 #define TIMEOUT (5) // Timeout in seconds to re-print message
 
@@ -36,9 +34,12 @@
 #define str(a) #a
 
 int main(void) {
+    aspire_uart_reset();
+    aspire_watchdog_set(false);
+
     while (1) {
 	aspire_uart_puts(ASCII_ART);
-	aspire_uart_puts("\n\nAspire is a RISC-V RV32IC_Zmmul_Zicsr thesis project.\n");
+	aspire_uart_puts("\n\nAspire is a RISC-V RV32IC_Zmmul_Zicsr CPU.\n");
 	aspire_uart_puts("This message will repeat in " xstr(TIMEOUT) " seconds.\n\n");
 
 	uint64_t begin = aspire_read_cycles();

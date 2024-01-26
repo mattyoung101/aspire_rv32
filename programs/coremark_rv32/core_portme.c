@@ -129,9 +129,8 @@ ee_u32 default_num_contexts = 1;
 void
 portable_init(core_portable *p, int *argc, char *argv[])
 {
-// #error \
-//     "Call board initialization routines in portable init (if needed), in particular initialize UART!\n"
-    //  Aspire: Currently no board initialisation required, done in HW on boot.
+    aspire_uart_reset();
+    aspire_watchdog_set(false);
 
     (void)argc; // prevent unused warning
     (void)argv; // prevent unused warning
