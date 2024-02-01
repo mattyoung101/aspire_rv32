@@ -22,8 +22,8 @@ correctness. Please carefully consider if these factors make Aspire suitable for
    - Minor in-house modifications to simplify it (removed RX, etc)
    - Not currently software reconfigurable, i.e., config (including baud rate!) is fixed in hardware
 - Watchdog timer
-    - 1 second timeout (not currently software reconfigurable)
-    - Can be reset by software
+    - Can be reset, enabled and disabled by software
+    - 1 second timeout (not currently software configurable)
     - If the timeout expires, the watchdog peripheral will trigger a hardware system reset automatically
 - (Extension) GPIO
     - Based on (TODO upstream)
@@ -68,6 +68,10 @@ TODO
 
 In the `programs` directory, there are some test programs that you can compile with Clang for the processor.
 There is a README in that directory explaining the process.
+
+In the `baseline_emulator` directory, there is a baseline emulator for the processor based on the libriscv
+project. This is used for differential fuzzing against a Verilator model to verify the processor and find
+implementation bugs. There is a README in that directory explaining the process.
 
 ### Synthesising and deploying the processor
 TODO

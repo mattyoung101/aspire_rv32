@@ -3,6 +3,7 @@
 # - https://github.com/jobroe/cmake-arm-embedded/blob/master/toolchain-arm-none-eabi.cmake
 # - https://github.com/UQRacing/cmu22/blob/master/CMakeLists.txt
 # - https://github.com/riscv-software-src/riscv-tests/blob/master/benchmarks/Makefile
+# - https://github.com/YosysHQ/picorv32/blob/master/picosoc/Makefile
 cmake_minimum_required(VERSION 3.20)
 project(riscv-programs C CXX ASM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -21,8 +22,10 @@ add_executable(coremark
 
     # Aspire HAL
     lib/aspire.c
-    lib/syscalls.c
+
+    # LibC stuff
     lib/crt.S
+    lib/syscalls.c
 )
 
 add_executable(hello_world 
@@ -30,11 +33,11 @@ add_executable(hello_world
     
     # Aspire HAL
     lib/aspire.c
-    lib/syscalls.c
-    lib/crt.S
-)
 
-# FIXME we need an RV32 bare metal linker script
+    # LibC stuff
+    lib/crt.S
+    lib/syscalls.c
+)
 
 target_include_directories(coremark PRIVATE coremark)
 target_include_directories(coremark PRIVATE coremark_rv32)
@@ -42,9 +45,10 @@ target_include_directories(coremark PRIVATE lib)
 target_include_directories(hello_world PRIVATE lib)
 
 # Shared compile options
-target_compile_options(coremark PRIVATE "-Wall" "-Wextra" "-ffunction-sections" "-fdata-sections" "-static" "-fno-common")
-target_compile_options(hello_world PRIVATE "-Wall" "-Wextra" "-ffunction-sections" "-fdata-sections" "-static"
-"-fno-common")
+target_compile_options(coremark PRIVATE "-Wall" "-Wextra" "-ffunction-sections" "-fdata-sections" "-static"
+    "-fno-common" "-ffreestanding")
+target_compile_options(hello_world PRIVATE "-Wall" "-Wextra" "-ffunction-sections" "-fdata-sections" "-static" 
+    "-fno-common" "-ffreestanding")
 
 # Specify CoreMark iteration count
 target_compile_definitions(coremark PRIVATE "-DITERATIONS=1000")
@@ -76,14 +80,13 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 # Link options
-target_link_options(coremark PRIVATE -nostdlib -nostartfiles -lgcc -T ${CMAKE_SOURCE_DIR}/lib/test.ld)
+target_link_options(coremark PRIVATE -nostdlib -nodefaultlibs -lgcc -T ${CMAKE_SOURCE_DIR}/lib/aspire.ld)
 target_link_libraries(coremark PRIVATE gcc)
 
-target_link_options(hello_world PRIVATE -nostdlib -nostartfiles -lgcc -T ${CMAKE_SOURCE_DIR}/lib/test.ld)
+target_link_options(hello_world PRIVATE -nostdlib -nodefaultlibs -lgcc -T ${CMAKE_SOURCE_DIR}/lib/aspire.ld)
 target_link_libraries(hello_world PRIVATE gcc)
 
 # Garbage collect unused sections
-# FIXME print memory usage not working
 SET(CMAKE_EXE_LINKER_FLAGS 
 "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections,--print-gc-sections,--print-memory-usage")
 
