@@ -24,7 +24,6 @@ SECTIONS {
         . = ALIGN(4);
         _etext = .;        /* define a global symbol at end of code */
         _sidata = _etext;  /* This is used by the startup in order to initialize the .data secion */
-        KEEP(*(.text.init)) /* Force linker to keep text.init */
     } >IMEM
 
     /* FIXME THIS IS NOT THE CASE FOR ASPIRE */

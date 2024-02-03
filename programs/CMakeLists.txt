@@ -69,7 +69,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     # Define compile flags for CoreMark
     target_compile_definitions(coremark PRIVATE "-DCOMPILER_FLAGS=\"${CMAKE_C_FLAGS} -Oz\"")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(STATUS "Debug build")
+    message(STATUS "Debug build, writing symbols")
 
     # Use -Og and write symbols
     target_compile_options(coremark PRIVATE "-Og" "-ggdb")
@@ -87,10 +87,26 @@ target_link_options(hello_world PRIVATE -nostdlib -nodefaultlibs -lgcc -T ${CMAK
 target_link_libraries(hello_world PRIVATE gcc)
 
 # Garbage collect unused sections
-SET(CMAKE_EXE_LINKER_FLAGS 
-"${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections,--print-gc-sections,--print-memory-usage")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections,--print-gc-sections,--print-memory-usage")
 
-# # Post processing command to create a hex file 
-# add_custom_command(TARGET ${TARGET}.elf POST_BUILD
-#         COMMAND ${CMAKE_OBJCOPY} -O ihex  ${TARGET}.elf  ${TARGET}.hex
-#         COMMENT "Invoking: Hexdump")
+# Post-processing to create a .bin file (for emulators and such)
+add_custom_command(TARGET coremark POST_BUILD 
+    COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_BINARY_DIR}/coremark ${CMAKE_BINARY_DIR}/coremark.bin
+    COMMENT "objcopy bin: coremark"
+)
+
+add_custom_command(TARGET hello_world POST_BUILD 
+    COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_BINARY_DIR}/hello_world ${CMAKE_BINARY_DIR}/hello_world.bin
+    COMMENT "objcopy bin: helloworld"
+)
+
+# Post-processing to create a .hex file (for the SPI flash chip)
+add_custom_command(TARGET coremark POST_BUILD 
+    COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_BINARY_DIR}/coremark ${CMAKE_BINARY_DIR}/coremark.hex
+    COMMENT "objcopy hex: coremark"
+)
+
+add_custom_command(TARGET hello_world POST_BUILD 
+    COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_BINARY_DIR}/hello_world ${CMAKE_BINARY_DIR}/hello_world.hex
+    COMMENT "objcopy hex: hello_world"
+)

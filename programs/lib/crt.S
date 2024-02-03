@@ -3,7 +3,7 @@
 # - https://github.com/riscv-software-src/riscv-tests/blob/master/benchmarks/common/crt.S
 
 .section .text.init
-.globl _start
+.global _start
 _start:
 
 # zero-initialize register file
