@@ -7,10 +7,15 @@ This is used for verification by differential fuzzing. Instructions are run thro
 register file is compared against the reference model.
 
 ### Building and running
-Requires CMake 3.20+, Clang, Ninja, LLD and spdlog which can be installed using your package manager.
-librscv is fetched automatically by CMake.
+First, acquire the build necessary build tools: CMake 3.20+, Clang, Ninja, LLD. These can be installed with
+the system package manager, e.g. `yay -S cmake clang ninja lld`.
 
-Build:
+The following libraries are required (mostly by Sail itself):
+- spdlog
+- libgmp
+- zlib
+
+Now, build:
 
 ```
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug  # or Release

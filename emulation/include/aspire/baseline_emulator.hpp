@@ -1,11 +1,10 @@
 #pragma once
-#include <libriscv/machine.hpp>
+#include <string>
+#include <vector>
 #include "aspire/config.hpp"
 #include "aspire/state.hpp"
 
 namespace aspire::emu {
-    using namespace riscv;
-    
     class BaselineEmulator {
 public:
         /// Creates the baseline emulator and loads a program into it.
@@ -23,7 +22,6 @@ public:
         void memdump(const std::string &path);
 
 private:
-        std::unique_ptr<Machine<RISCV32>> machine;
         uint32_t wdogRemaining = F_CPU;
         std::string uartBuffer;
         

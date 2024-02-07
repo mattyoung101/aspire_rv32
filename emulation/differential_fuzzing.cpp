@@ -1,8 +1,6 @@
 // This file implements the differential fuzzing simulation.
 #include <iostream>
 #include <fstream>
-#include <libriscv/machine.hpp>
-#include <libriscv/debug.hpp>
 #include <spdlog/spdlog.h>
 #include "aspire/baseline_emulator.hpp"
 #include "aspire/state.hpp"
