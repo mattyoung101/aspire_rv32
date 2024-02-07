@@ -11,9 +11,9 @@ uint64_t aspire_read_cycles(void) {
 }
 
 void aspire_uart_reset(void) {
-    ASPIRE_UART_RESETN = 0; // Active LOW
-    __asm__ volatile("nop;"); // ensure reset goes through (FIXME may not be necessary)
     ASPIRE_UART_RESETN = 1;
+    __asm__ volatile("nop;"); // ensure reset goes through (FIXME may not be necessary)
+    ASPIRE_UART_RESETN = 0;
 }
 
 void aspire_uart_put(char c) {
@@ -23,22 +23,22 @@ void aspire_uart_put(char c) {
     // if you want to put multiple characters, of course, it will block for all but the last
     while (ASPIRE_UART_READY == 0);
 
-    ASPIRE_UART_VALID = 0; // tell HW: we are putting in new data
     ASPIRE_UART_DATA = c; // supply the data
-    ASPIRE_UART_VALID = 1; // tell HW: you're good to go mate
+    ASPIRE_UART_VALID = 1; // start transaction
+    ASPIRE_UART_VALID = 0; // don't do the transaction twice
 }
 
-void aspire_uart_puts(const char *string) {
-    const char *c = string;
+void aspire_uart_puts(char *string) {
+    char *c = string;
     while (*c) {
-	aspire_uart_put(*c++);
+	    aspire_uart_put(*c++);
     }
 }
 
 void aspire_watchdog_reset(void) {
-    ASPIRE_WDOG_RESETN = 0;
+    ASPIRE_WDOG_RESET = 1;
     __asm__ volatile("nop"); // ensure reset goes through (FIXME may not be necessary)
-    ASPIRE_WDOG_RESETN = 1;
+    ASPIRE_WDOG_RESET = 0;
 }
 
 void aspire_watchdog_set(bool enabled) {

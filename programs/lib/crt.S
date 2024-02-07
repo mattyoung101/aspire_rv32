@@ -8,9 +8,8 @@
 _start:
     # zero-initialize register file
     addi x1, zero, 0
-    # x2 (sp) is initialized by reset
-    # Aspire: Do it here anyway
-    addi x2, zero, 0
+    # stack pointer at end of RAM, i.e. 0x20_000 - 1
+    li x2, 0x1FFFF
     addi x3, zero, 0
     addi x4, zero, 0
     addi x5, zero, 0
