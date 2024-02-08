@@ -10,8 +10,10 @@ You will need:
 - Ninja
 - Clang
 - LLD
+- Just (command runner)
 
-On Arch you can install these using using: `yay -S cmake ninja clang lld llvm`
+On Arch you can install these using using: `yay -S cmake ninja clang lld llvm`. See the main README for
+acquiring Just.
 
 ### Compiling the toolchain from source
 Yes, you read right. Basically, get trolled, we have to compile the GNU toolchain (_only as a prerequisite_) 
@@ -52,7 +54,8 @@ Now that we've built an LLVM RISC-V RV32IC ilp32 ABI toolchain (phew, mouthful),
 You need to export the environment variable `RISCV_LLVM_HOME` which is the path to the build directory for the toolchain you
 just built. So in my case, it's `set -x RISCV_LLVM_HOME /home/matt/build/riscv-ilp32`
 
-Now you can just run `./build.sh` and CMake will take care of everything else.
+If you want a release build, do `just setup_release`. For debug, do `just setup_debug`. Then, `cd` into the
+build directory and run `ninja`.
 
 ## Programs
 ### CoreMark
