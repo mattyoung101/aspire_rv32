@@ -5,8 +5,8 @@ ENTRY(_start)
 
 MEMORY
 {
-    IMEM (rx)        : ORIGIN = 0x000080, LENGTH = 0x10000 /* IMEM (program), 64 KiB */
-    DMEM (xrw)       : ORIGIN = 0x010081, LENGTH = 0x0F800 /* DMEM (RAM), 62 KiB */
+    IMEM (rx)        : ORIGIN = 0x000080, LENGTH = 0x18000 /* IMEM (program), 96 KiB */
+    DMEM (xrw)       : ORIGIN = 0x018081, LENGTH = 0x07800 /* DMEM (RAM), 30 KiB */
 }
 
 SECTIONS {
