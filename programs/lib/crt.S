@@ -1,6 +1,8 @@
+# This is the Aspire startup script, which in turn calls main().
 # Sources: 
 # - https://github.com/YosysHQ/picorv32/blob/master/picosoc/start.s
 # - https://github.com/riscv-software-src/riscv-tests/blob/master/benchmarks/common/crt.S
+# - https://www.five-embeddev.com//quickref/global_pointer.html
 
 .section .text.init
 .global _start
@@ -8,8 +10,7 @@
 _start:
     # zero-initialize register file
     addi x1, zero, 0
-    # stack pointer at end of RAM, i.e. 0x20_000 - 1
-    li x2, 0x1FFFF
+    addi x2, zero, 0 # SP; we'll come back to this later
     addi x3, zero, 0
     addi x4, zero, 0
     addi x5, zero, 0
@@ -40,6 +41,16 @@ _start:
     addi x30, zero, 0
     addi x31, zero, 0
 
+    # initialise the stack pointer
+    # stack pointer at end of RAM, i.e. 0x20_000 - 1
+    li x2, 0x1FFFF
+
+    # initialise the global pointer
+    .option push
+	.option norelax
+	la gp, __global_pointer$
+	.option pop
+
     # zero-init bss section
     la a0, _sbss
     la a1, _ebss
@@ -52,6 +63,7 @@ end_init_bss:
 
 # call main
 call main
+# this is presumably in case main() returns
 loop:
     j loop
 

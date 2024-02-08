@@ -30,6 +30,11 @@ SECTIONS {
         . = ALIGN(4);
         *(.data)           /* .data sections */
         *(.data*)          /* .data* sections */
+        
+        /* global pointer */
+        . = ALIGN(8);
+        PROVIDE( __global_pointer$ = . + 0x800 );
+
         *(.sdata)           /* .sdata sections */
         *(.sdata*)          /* .sdata* sections */
         . = ALIGN(4);
