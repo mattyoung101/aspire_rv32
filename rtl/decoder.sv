@@ -1,1 +1,1 @@
-// Decoder for RV32IC_Zmmul_Zicsr
+// Decoder for RV32I_Zmmul_Zicsr

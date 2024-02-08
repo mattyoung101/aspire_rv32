@@ -30,10 +30,10 @@ message(STATUS "RISC-V cross compile: ${CROSS_COMPILE}")
 # The Generic system name is used for embedded targets (targets without OS) in
 # CMake
 set(CMAKE_SYSTEM_NAME       Generic)
-# FIXME: We want to use "rv32ic_zmmul_zicsr", but clangd has issues, see: 
+# FIXME: We want to use "rv32i_zmmul_zicsr", but clangd has issues, see: 
 # https://lore.kernel.org/linux-patches/20230328142608.297531169@linuxfoundation.org/
 # In any case, it doesn't seem to matter as we can still use the CSR instructions regardless.
-set(CMAKE_SYSTEM_PROCESSOR  rv32ic_zmmul)
+set(CMAKE_SYSTEM_PROCESSOR  rv32i_zmmul)
 set(ABI                     "ilp32")
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 

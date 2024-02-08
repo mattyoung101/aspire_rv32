@@ -8,8 +8,10 @@ CoreMark, which is the main target program of this processor. I also want SPEC C
 You will need:
 - CMake 3.20+ 
 - Ninja
+- Clang
+- LLD
 
-On Arch you can install these using using: `yay -S cmake ninja mold spike clang lld llvm`
+On Arch you can install these using using: `yay -S cmake ninja clang lld llvm`
 
 ### Compiling the toolchain from source
 Yes, you read right. Basically, get trolled, we have to compile the GNU toolchain (_only as a prerequisite_) 
@@ -27,7 +29,7 @@ hacking time).
 3. Create an installation directory, I'm using `~/build/riscv-ilp32`. This is where the toolchain will end up.
 4. Export the installation dir as `$RISCV`. In fish, I use `set -x RISCV /home/matt/build/riscv-ilp32`
 5. Optionally set Clang as the compiler, `set -x CC clang; set -x CXX clang++` to compile GCC with Clang :)
-6. Run `./configure --prefix=$RISCV --enable-llvm --disable-linux --with-arch=rv32ic_zmmul_zicsr_zifencei --with-abi=ilp32` <sup>NOTE1</sup>
+6. Run `./configure --prefix=$RISCV --enable-llvm --disable-linux --with-arch=rv32i_zmmul_zicsr_zifencei --with-abi=ilp32` <sup>NOTE1</sup>
 7. Run `make -j$(nproc)`.
 8. Wait some time... (~15 minutes on my Ryzen 9 5950X)
 9. Done! You can run `find . -exec llvm-strip --strip-unneeded {} \;` in `$RISCV/bin` to reduce the size of 
@@ -36,6 +38,8 @@ hacking time).
 **NOTE1:** We have to build the toolchain with Zifencei, even though Aspire doesn't support it. Aspire is
 currently expected to translate any Zifencei instructions to either illegal or no-op. We have to build with
 Zifencei because the proxy kernel seems to require it. TL;DR Spike supports Zifencei, but the Aspire won't.
+
+FIXME the above may not be true any more since we aren't using Spike
 
 TODO: consider dockerizing this process
 

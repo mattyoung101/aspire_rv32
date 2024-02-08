@@ -3,7 +3,7 @@ _Aspire_ is a RISC-V CPU designed for my Bachelor of Computer Science (Honours) 
 the University of Queensland. The title of the thesis is,
 "A triple modular redundancy fault tolerant RISC-V processor for safety-critical applications".
 
-Aspire is designed in SystemVerilog, and implements the RV32IC_Zmmul_Zicsr instruction set
+Aspire is designed in SystemVerilog, and implements the RV32I_Zmmul_Zicsr instruction set
 architecture. The processor uses triple-modular redundancy (TMR) to prevent single-event upsets (SEUs),
 making it potentially useful in safety-critical and rad-hardened applications. Particular industry
 areas where the processor may be useful include space, defence, medical and automotive.
@@ -14,7 +14,7 @@ correctness. Please carefully consider if these factors make Aspire suitable for
 
 ## Features
 - TBA
-- Implements RV32IC_Zmmul_Zicsr ISA
+- Implements RV32I_Zmmul_Zicsr ISA
     - Features a single cycle 32x32-bit multiplier, 64-bit result, both signed/unsigned
     - (Maybe) Supports `clz` from Zbb (no other instructions from that extension though)
 - Hardware UART TX peripheral (115200 baud, 8 bit word size, 1 stop bit, no parity)
