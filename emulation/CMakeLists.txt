@@ -4,20 +4,27 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
 
-# Acquire libriscv
-include(FetchContent)
-set(FETCHCONTENT_QUIET FALSE)
-FetchContent_Declare(libriscv
-  GIT_REPOSITORY https://github.com/fwsGonzo/libriscv
-  GIT_TAG        v1.1 # or any later version
-  GIT_PROGRESS TRUE
-)
-FetchContent_MakeAvailable(libriscv)
-
 # Baseline emulator executable
-add_executable(differential_fuzzing differential_fuzzing.cpp baseline_emulator.cpp)
-target_include_directories(differential_fuzzing  PRIVATE include)
+add_executable(differential_fuzzing 
+    differential_fuzzing.cpp 
+    baseline_emulator.cpp
+    riscv_em/core/csr/csr.c
+    riscv_em/core/mmu/mmu.c
+    riscv_em/core/pmp/pmp.c
+    riscv_em/core/trap/trap.c
+    riscv_em/core/core.c
+)
+target_include_directories(differential_fuzzing PRIVATE 
+    include 
+    riscv_em/core 
+    riscv_em/core/csr
+    riscv_em/core/mmu
+    riscv_em/core/pmp
+    riscv_em/core/trap
+    riscv_em/helpers
+)
 target_compile_options(differential_fuzzing PRIVATE "-Wall" "-Wextra" "-ggdb")
+target_compile_definitions(differential_fuzzing PRIVATE "-DRISCV_EM_DEBUG")
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL Release)
     message(STATUS "Release build")
@@ -32,9 +39,6 @@ endif()
 # spdlog
 find_package(spdlog REQUIRED)
 target_link_libraries(differential_fuzzing spdlog::spdlog)
-
-# link libriscv
-target_link_libraries(differential_fuzzing riscv)
 
 # Force LLD
 add_link_options("-fuse-ld=lld")

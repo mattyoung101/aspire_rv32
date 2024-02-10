@@ -1,14 +1,12 @@
 // This file implements the differential fuzzing simulation.
 #include <iostream>
 #include <fstream>
-#include <libriscv/machine.hpp>
-#include <libriscv/debug.hpp>
 #include <spdlog/spdlog.h>
 #include "aspire/baseline_emulator.hpp"
 #include "aspire/state.hpp"
 
 int main(int argc, char *argv[]) {
-    spdlog::set_level(spdlog::level::trace);
+    spdlog::set_level(spdlog::level::debug);
     spdlog::info("Aspire Differential Fuzzer - (c) 2024 Matt Young.");
 
     if (argc < 2) {

@@ -1,11 +1,12 @@
 #pragma once
-#include <libriscv/machine.hpp>
+#include <string>
+#include <vector>
+#include <array>
 #include "aspire/config.hpp"
 #include "aspire/state.hpp"
+#include "core.h"
 
 namespace aspire::emu {
-    using namespace riscv;
-    
     class BaselineEmulator {
 public:
         /// Creates the baseline emulator and loads a program into it.
@@ -22,10 +23,16 @@ public:
         /// Dumps the whole contents of RAM to the specified file path
         void memdump(const std::string &path);
 
+        /// Core memory (has to be publicly exposed for C callback function)
+        std::array<uint8_t, RAM_SIZE> memory{};
+
 private:
-        std::unique_ptr<Machine<RISCV32>> machine;
+        // The core itself
+        rv_core_td core;
+
+        // MMIO peripheral status
         uint32_t wdogRemaining = F_CPU;
-        std::string uartBuffer;
+        std::string uartBuffer{};
         
         void resetMMIO();
         void updateMMIO();

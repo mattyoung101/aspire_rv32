@@ -56,7 +56,7 @@ Papers are written in LaTeX and built using `latexmk`. You will therefore need T
 You can install as follows: `yay -S texlive texlive-binextra`.
 
 The build script uses [Just](https://github.com/casey/just), a command line runner. You can acquire it with
-`cargo install just`.
+`cargo install just` if you have Cargo, or I believe it's on the AUR as well.
 
 **Developer tools**
 
@@ -67,11 +67,11 @@ SystemVerilog LSP.
 TODO
 
 In the `programs` directory, there are some test programs that you can compile with Clang for the processor.
-There is a README in that directory explaining the process.
+There is a README in that directory explaining the process including setting up the toolchain.
 
-In the `baseline_emulator` directory, there is a baseline emulator for the processor based on the libriscv
-project. This is used for differential fuzzing against a Verilator model to verify the processor and find
-implementation bugs. There is a README in that directory explaining the process.
+In the `emulation` directory, there is an emulator for the processor. This is used for differential fuzzing 
+against a Verilator model to verify the processor and find implementation bugs. There is a README in that 
+directory explaining the process.
 
 ### Synthesising and deploying the processor
 TODO
@@ -85,6 +85,8 @@ If you install inotify-tools using `yay -S inotifytools`, the `watchpapers.sh` s
 recompile papers using `inotifywait` when they are modified.
 
 Make sure you have the necessary dependencies as described in Setting up the toolchain.
+
+TODO automatic recompile when changed
 
 ## Licence
 SystemVerilog code: (TODO check with UQ, one of MPL 2.0 or Apache)

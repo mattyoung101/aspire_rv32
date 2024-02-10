@@ -44,7 +44,7 @@ int main(void) {
 
     while (1) {
         aspire_uart_puts(ASCII_ART);
-        aspire_uart_puts("\n\nAspire is a RISC-V RV32I_Zmmul_Zicsr CPU.\n");
+        aspire_uart_puts("\n\nIf you are seeing this, Aspire has booted successfully!\n");
         aspire_uart_puts("This message will repeat in " xstr(TIMEOUT) " seconds.\n\n");
 
         // uint64_t begin = aspire_read_cycles();
