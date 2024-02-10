@@ -13,6 +13,7 @@ add_executable(differential_fuzzing
     riscv_em/core/pmp/pmp.c
     riscv_em/core/trap/trap.c
     riscv_em/core/core.c
+    riscv-disas.c
 )
 target_include_directories(differential_fuzzing PRIVATE 
     include 
@@ -33,7 +34,7 @@ elseif ("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
     message(STATUS "Debug build, adding sanitizers")
     target_compile_options(differential_fuzzing PRIVATE "-fsanitize=address" "-fsanitize=undefined"
     "-fno-omit-frame-pointer")
-    target_link_options(differential_fuzzing PRIVATE "-fsanitize=address" "-fsanitize=undefined")
+    target_link_options(differential_fuzzing PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-flto=thin")
 endif()
 
 # spdlog

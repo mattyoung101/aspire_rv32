@@ -10,9 +10,9 @@
 #include "aspire/state.hpp"
 #include "core.h"
 #include "riscv_types.h"
+#include "riscv-disas.h"
 
 extern "C" {
-
 static rv_ret rv_bus_access(void *priv, privilege_level priv_level, bus_access_type access_type, 
                                 rv_uint_xlen address, void *value, uint8_t len) {
     if (priv_level != machine_mode) {
@@ -20,7 +20,7 @@ static rv_ret rv_bus_access(void *priv, privilege_level priv_level, bus_access_t
         throw std::runtime_error("Illegal privilege mode");
     }
 
-    // cursed
+    // cursed, but works
     aspire::emu::BaselineEmulator *emu = static_cast<aspire::emu::BaselineEmulator*>(priv);
 
     if (access_type == bus_read_access || access_type == bus_instr_access) {
@@ -36,7 +36,6 @@ static rv_ret rv_bus_access(void *priv, privilege_level priv_level, bus_access_t
 
     return rv_ok;
 }
-
 };
 
 aspire::emu::BaselineEmulator::BaselineEmulator(std::vector<uint8_t> bytes) {
@@ -53,8 +52,21 @@ aspire::emu::BaselineEmulator::BaselineEmulator(std::vector<uint8_t> bytes) {
 }
 
 void aspire::emu::BaselineEmulator::step() {
-    //rv_core_reg_dump(&core);
+    // Disassemble instruction at PC
+    char buf[128] = {0};
+    uint32_t instr = 0;
+    std::memcpy(&instr, memory.data() + core.pc, 4); // load 32 bits
+    disasm_inst(buf, 128, rv32, core.pc, instr);
+    spdlog::trace("Instr: {}", buf);
+    
+    // Step the simulation
     rv_core_run(&core);
+    
+    // Check to make sure it didn't enter machine mode
+    if (core.curr_priv_mode != machine_mode) {
+        spdlog::error("Illegal privilege mode: {}", static_cast<int>(core.curr_priv_mode));
+        throw std::runtime_error("Illegal privilege mode");
+    }
     
     // check MMIO
     updateMMIO();
@@ -62,9 +74,10 @@ void aspire::emu::BaselineEmulator::step() {
 
 aspire::emu::State aspire::emu::BaselineEmulator::getState() {
     aspire::emu::State state{};
-    
-    // TODO
-
+    state.pc = core.pc;
+    for (int i = 0; i < 32; i++) {
+        state.regfile[i] = core.x[i];
+    }
     return state;
 }
 
@@ -112,4 +125,7 @@ void aspire::emu::BaselineEmulator::updateMMIO() {
         // signal the processor we can go again
         memory[ASPIRE_UART_VALID] = 1;
     }
+
+    // Check watchdog
+    // TODO
 }

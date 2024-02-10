@@ -146,6 +146,8 @@ portable_init(core_portable *p, int *argc, char *argv[])
         ee_printf("ERROR! Please define ee_u32 to a 32b unsigned type!\n");
     }
     p->portable_id = 1;
+
+    ee_printf("Starting CoreMark in portable_init()\n");
 }
 /* Function : portable_fini
         Target specific final code
@@ -153,5 +155,9 @@ portable_init(core_portable *p, int *argc, char *argv[])
 void
 portable_fini(core_portable *p)
 {
+    ee_printf("Finishing CoreMark in portable_fini()\n");
     p->portable_id = 0;
+
+    // block forever
+    while (true);
 }

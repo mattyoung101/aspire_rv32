@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     // initialise the Verilator emulator
 
     // run the simulation
-    for (int i = 0; i < 10000; i++) {
+    while (true) {
         baseline.step();
     }
     baseline.memdump("/tmp/aspire_dump.bin");
