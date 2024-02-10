@@ -16,3 +16,4 @@ static constexpr uint32_t ASPIRE_UART_VALID = 0x000003; // SW Write
 static constexpr uint32_t ASPIRE_UART_READY = 0x000004; // SW Read
 static constexpr uint32_t ASPIRE_WDOG_ENABLE = 0x000005; // SW Write
 static constexpr uint32_t ASPIRE_WDOG_RESET = 0x000006; // SW Write
+static constexpr uint32_t ASPIRE_SIM_STOP = 0x000007; // SW Write

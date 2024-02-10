@@ -107,6 +107,12 @@ void aspire::emu::BaselineEmulator::resetMMIO() {
 }
 
 void aspire::emu::BaselineEmulator::updateMMIO() {
+    // Not really MMIO, but check if someone dereferenced a null pointer
+    if (memory[0] != 0) {
+        spdlog::error("Address 0x0 has been written to! Null pointer dereference!");
+        exit(1);
+    }
+
     // Check UART
     if (memory[ASPIRE_UART_VALID] == 1) {
         // UART is valid! Store the character.
@@ -128,4 +134,10 @@ void aspire::emu::BaselineEmulator::updateMMIO() {
 
     // Check watchdog
     // TODO
+
+    // Check sim exit
+    if (memory[ASPIRE_SIM_STOP] == 1) {
+        spdlog::info("Simulation exit requested by running program");
+        exit(0);
+    }
 }

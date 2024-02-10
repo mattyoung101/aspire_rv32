@@ -9,20 +9,24 @@
 #define F_CPU (20000000)
 
 /// Aspire UART peripheral
-/// INPUT Active reset -> when set to '1', UART peripheral is reset
+/// WRITE Active reset -> when set to '1', UART peripheral is reset
 #define ASPIRE_UART_RESETN ((*(volatile uint8_t *) 0x000001))
-/// INPUT UART data field -> set to data byte when ASPIRE_UART_READY = '1'
+/// WRITE UART data field -> set to data byte when ASPIRE_UART_READY = '1'
 #define ASPIRE_UART_DATA ((*(volatile uint8_t *) 0x000002))
-/// INPUT UART valid flag -> set this to '1' when a UART byte is ready to be transmitted
+/// WRITE UART valid flag -> set this to '1' when a UART byte is ready to be transmitted
 #define ASPIRE_UART_VALID ((*(volatile uint8_t *) 0x000003))
-/// OUTPUT UART ready flag -> when set to '1', UART is ready for next data
+/// READ UART ready flag -> when set to '1', UART is ready for next data
 #define ASPIRE_UART_READY ((*(volatile uint8_t *) 0x000004))
 
 /// Aspire watchdog timer peripheral
-/// INPUT Enable/disable watchdog -> when set to '1', WDOG is enabled, '0', watchdog is disabled
+/// WRITE Enable/disable watchdog -> when set to '1', WDOG is enabled, '0', watchdog is disabled
 #define ASPIRE_WDOG_ENABLE ((*(volatile uint8_t *) 0x000005))
-/// INPUT Reset the watchdog timer -> when set to '1', watchdog is reset
+/// WRITE Reset the watchdog timer -> when set to '1', watchdog is reset
 #define ASPIRE_WDOG_RESET ((*(volatile uint8_t *) 0x000006))
+
+/// Aspire sim stop peripheral
+/// WRITE Requests the simulation to exit when in simulation when '1' is written
+#define ASPIRE_SIM_STOP ((*(volatile uint8_t *) 0x000007))
 
 /// Reads the cycle counter for RV32 using the rdcycle and rdcycleh pseudoinstructions.
 uint64_t aspire_read_cycles(void);
@@ -41,3 +45,6 @@ void aspire_watchdog_set(bool enabled);
 
 /// Resets the watchdog timer
 void aspire_watchdog_reset(void);
+
+/// Requests the simulation to exit when in simulation/emulation. Does nothing on FPGA.
+void aspire_sim_stop(void);

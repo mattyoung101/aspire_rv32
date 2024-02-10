@@ -11,9 +11,11 @@ register file is compared against the reference model.
 Requires CMake 3.20+, Clang, Ninja, LLD and spdlog which can be installed using your package manager, 
 e.g. `yay -S cmake clang ninja lld spdlog`
 
-Build:
+Build (in the fish shell):
 
 ```
+set -x CXX clang  # if you want Clang
+set -x CC clang  # if you want Clang
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug  # or Release
 cd build
 ninja

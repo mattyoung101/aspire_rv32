@@ -45,3 +45,7 @@ void aspire_watchdog_set(bool enabled) {
     ASPIRE_WDOG_ENABLE = enabled ? 1 : 0;
     aspire_watchdog_reset();
 }
+
+void aspire_sim_stop(void) {
+    ASPIRE_SIM_STOP = 1;
+}

@@ -29,12 +29,13 @@ target_compile_definitions(differential_fuzzing PRIVATE "-DRISCV_EM_DEBUG")
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL Release)
     message(STATUS "Release build")
-    # TODO optimisations
+    target_compile_options(differential_fuzzing PRIVATE "-O3" "-march=native" "-mtune=native")
+    target_link_options(differential_fuzzing PRIVATE "-flto=thin")
 elseif ("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
     message(STATUS "Debug build, adding sanitizers")
     target_compile_options(differential_fuzzing PRIVATE "-fsanitize=address" "-fsanitize=undefined"
     "-fno-omit-frame-pointer")
-    target_link_options(differential_fuzzing PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-flto=thin")
+    target_link_options(differential_fuzzing PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
 # spdlog

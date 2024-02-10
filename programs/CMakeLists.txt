@@ -51,7 +51,7 @@ target_compile_options(hello_world PRIVATE "-Wall" "-Wextra" "-ffunction-section
     "-fno-common" "-ffreestanding")
 
 # Specify CoreMark iteration count
-target_compile_definitions(coremark PRIVATE "-DITERATIONS=5000")
+target_compile_definitions(coremark PRIVATE "-DITERATIONS=1000")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     message(STATUS "Release build, using min size")

@@ -46,6 +46,7 @@ int main(void) {
         aspire_uart_puts(ASCII_ART);
         aspire_uart_puts("\n\nIf you are seeing this, Aspire has booted successfully!\n");
         aspire_uart_puts("This message will repeat in " xstr(TIMEOUT) " seconds.\n\n");
+        aspire_sim_stop();
 
         // uint64_t begin = aspire_read_cycles();
         // block while the difference between current time and begin time is

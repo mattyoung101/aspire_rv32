@@ -158,6 +158,9 @@ portable_fini(core_portable *p)
     ee_printf("Finishing CoreMark in portable_fini()\n");
     p->portable_id = 0;
 
+    // request exit
+    aspire_sim_stop();
+
     // block forever
     while (true);
 }
