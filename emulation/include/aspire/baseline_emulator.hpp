@@ -25,6 +25,9 @@ public:
 
         /// Core memory (has to be publicly exposed for C callback function)
         std::array<uint8_t, RAM_SIZE> memory{};
+        
+        /// If set to true, the running program requested a sim exit using MMIO
+        bool exitRequested = false;
 
 private:
         // The core itself

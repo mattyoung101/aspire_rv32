@@ -1,14 +1,18 @@
 #pragma once
 #include <cstdint>
 
+// This file contains constants used in the Aspire emulator.
+
 /// Simulated CPU frequency in Hz
-static constexpr uint32_t F_CPU = 20000;
+static constexpr uint32_t F_CPU = 20'000'000;
 
 /// Address where programs are executed at.
 static constexpr uint32_t LOAD_ADDR = 0x80;
 
 /// Aspire has 128 KiB of RAM
 static constexpr uint32_t RAM_SIZE = 128 * 1024;
+
+// MMIO registers
 
 static constexpr uint32_t ASPIRE_UART_RESET = 0x000001; // SW Write
 static constexpr uint32_t ASPIRE_UART_DATA = 0x000002; // SW Write

@@ -1,16 +1,16 @@
-// This file implements the baseline emulator for Aspire based on libriscv.
-// This is used for differential fuzzing against the Verilator emulator.
 #include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <spdlog/spdlog.h>
-#include <string.h>
 #include "aspire/baseline_emulator.hpp"
 #include "aspire/config.hpp"
 #include "aspire/state.hpp"
 #include "core.h"
 #include "riscv_types.h"
 #include "riscv-disas.h"
+
+// This file implements the baseline emulator for Aspire based on libriscv.
+// This is used for differential fuzzing against the Verilator emulator.
 
 extern "C" {
 static rv_ret rv_bus_access(void *priv, privilege_level priv_level, bus_access_type access_type, 
@@ -55,7 +55,9 @@ void aspire::emu::BaselineEmulator::step() {
     // Disassemble instruction at PC
     char buf[128] = {0};
     uint32_t instr = 0;
-    std::memcpy(&instr, memory.data() + core.pc, 4); // load 32 bits
+    // load 4 bytes from RAM at PC into our 32-bit instruction value
+    std::memcpy(&instr, memory.data() + core.pc, 4);
+    // now actually disassemble it
     disasm_inst(buf, 128, rv32, core.pc, instr);
     spdlog::trace("Instr: {}", buf);
     
@@ -69,6 +71,7 @@ void aspire::emu::BaselineEmulator::step() {
     }
     
     // check MMIO
+    // TODO only update MMIO if the previous instruction was a load/store
     updateMMIO();
 }
 
@@ -128,16 +131,28 @@ void aspire::emu::BaselineEmulator::updateMMIO() {
             uartBuffer += c;
         }
 
-        // signal the processor we can go again
+        // signal the processor we have printed
         memory[ASPIRE_UART_VALID] = 1;
     }
 
     // Check watchdog
-    // TODO
+    if (memory[ASPIRE_WDOG_ENABLE] == 1) {
+        // check if watchdog was reset
+        if (memory[ASPIRE_WDOG_RESET] == 1) {
+            spdlog::info("Watchdog: Reset");
+            wdogRemaining = F_CPU;
+        }
+
+        // check if watchdog expired
+        if (wdogRemaining-- <= 0) {
+            spdlog::error("Watchdog: Timeout!");
+            exit(1);
+        }
+    }
 
     // Check sim exit
     if (memory[ASPIRE_SIM_STOP] == 1) {
         spdlog::info("Simulation exit requested by running program");
-        exit(0);
+        exitRequested = true;
     }
 }

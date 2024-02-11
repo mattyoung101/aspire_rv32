@@ -65,19 +65,19 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set_target_properties(coremark PROPERTIES LINK_FLAGS -s)
     set_target_properties(hello_world PROPERTIES LINK_FLAGS_RELEASE -s)
     set_target_properties(hello_world PROPERTIES LINK_FLAGS -s)
-
-    # Define compile flags for CoreMark
-    target_compile_definitions(coremark PRIVATE "-DCOMPILER_FLAGS=\"${CMAKE_C_FLAGS} -Oz\"")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Debug build, writing symbols")
 
     # Use -Og and write symbols
     target_compile_options(coremark PRIVATE "-Og" "-ggdb")
     target_compile_options(hello_world PRIVATE "-Og" "-ggdb")
-
-    # Define compile flags for CoreMark
-    target_compile_definitions(coremark PRIVATE "-DCOMPILER_FLAGS=\"${CMAKE_C_FLAGS} -Og\"")
 endif()
+
+# Define compile flags for CoreMark
+get_target_property(COREMARK_FLAGS coremark COMPILE_OPTIONS)
+list(JOIN COREMARK_FLAGS " " COREMARK_FLAGS_STR)
+message(STATUS "CoreMark flags: ${COREMARK_FLAGS_STR}")
+target_compile_definitions(coremark PRIVATE "-DCOMPILER_FLAGS=\"${COREMARK_FLAGS_STR}\"")
 
 # Link options
 target_link_options(coremark PRIVATE -nostdlib -nodefaultlibs -lgcc -T ${CMAKE_SOURCE_DIR}/lib/aspire.ld)
