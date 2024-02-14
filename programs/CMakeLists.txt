@@ -8,6 +8,10 @@ cmake_minimum_required(VERSION 3.20)
 project(riscv-programs C CXX ASM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+#################
+# Main programs #
+#################
+
 add_executable(coremark 
     # Base CoreMark
     coremark/core_list_join.c 
@@ -87,7 +91,7 @@ target_link_options(hello_world PRIVATE -nostdlib -nodefaultlibs -lgcc -T ${CMAK
 target_link_libraries(hello_world PRIVATE gcc)
 
 # Garbage collect unused sections
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections,--print-gc-sections,--print-memory-usage")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections,--print-memory-usage")
 
 # Post-processing to create a .bin file (for emulators and such)
 add_custom_command(TARGET coremark POST_BUILD 
@@ -110,3 +114,35 @@ add_custom_command(TARGET hello_world POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_BINARY_DIR}/hello_world ${CMAKE_BINARY_DIR}/hello_world.hex
     COMMENT "objcopy hex: hello_world"
 )
+
+#####################
+# RISC-V Arch Tests #
+#####################
+file(GLOB ARCH_TEST_ASM_SRC "riscv-arch-test/riscv-test-suite/rv32i_m/I/src/*.S")
+
+foreach(ARCH_ASM IN LISTS ARCH_TEST_ASM_SRC)
+    get_filename_component(TARGET_FILE ${ARCH_ASM} NAME_WLE)
+    set(TARGET "riscv-arch-${TARGET_FILE}")
+    message(STATUS "Generating test binaries for arch test: ${ARCH_ASM} (target: ${TARGET})")
+    
+    # Compile the assembly file
+    add_executable(${TARGET} ${ARCH_ASM})
+    target_include_directories(${TARGET} PRIVATE riscv-arch-test/riscv-test-suite/env lib)
+    target_compile_options(${TARGET} PRIVATE "-Wall" "-Wextra" "-ffunction-sections" "-fdata-sections" "-static" 
+        "-fno-common" "-ffreestanding")
+    # XLEN macro is required to be defined, 32 bits
+    target_compile_definitions(${TARGET} PRIVATE "-DXLEN=32")
+    target_link_options(${TARGET} PRIVATE -nostdlib -nodefaultlibs -lgcc -T
+        ${CMAKE_SOURCE_DIR}/lib/aspire_arch_test.ld)
+    target_link_libraries(${TARGET} PRIVATE gcc)
+    
+    # Generate flash files (bin and hex)
+    add_custom_command(TARGET ${TARGET} POST_BUILD 
+        COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_BINARY_DIR}/${TARGET} ${CMAKE_BINARY_DIR}/${TARGET}.bin
+        COMMENT "objcopy bin: ${TARGET}"
+    )
+    add_custom_command(TARGET ${TARGET} POST_BUILD 
+        COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_BINARY_DIR}/${TARGET} ${CMAKE_BINARY_DIR}/${TARGET}.hex
+        COMMENT "objcopy hex: ${TARGET}"
+    )
+endforeach()

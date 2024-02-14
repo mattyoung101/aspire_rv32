@@ -29,6 +29,9 @@ correctness. Please carefully consider if these factors make Aspire suitable for
     - Based on (TODO upstream)
 
 ## Getting started with Aspire
+### Cloning
+This repo uses git submodules, so clone with `git clone --recurse-submodules -j8 git@github.com:mattyoung101/aspire_rv32.git`
+
 ### Setting up the toolchain
 I'm going to assume you use Arch, because that's what I use (sorry). If you use another distro like Ubuntu, 
 the same instructions still apply, but you might have to build some packages from source - Ubuntu ships 
@@ -44,19 +47,31 @@ In any case, they're both equivalent, as long as you're using the bleeding edge 
 
 **Verification tools**
 
-You need a C++ compiler that supports C++20. I use Clang 16. You also need CMake, Verilator, GTKWave, Icarus
-Verilog, Sigrok and Pulseview.
+You need the following long list of tools:
 
-All of these are in the regular Arch repos: `yay -S cmake clang verilator gtkwave iverilog sigrok-cli
-pulseview`
+- CMake 3.20+
+- Clang 16+ (or another C++20 compiler, but I only use Clang)
+- LLD
+- LLVM
+- Ninja
+- Verilator
+- GTKWave
+- Icarus Verilog
+- Sigrok
+- Pulseview
+- Flashrom
+- spdlog
+- Just
+
+All of these are in the regular Arch repos: `yay -S cmake clang lld llvm ninja verilator gtkwave iverilog
+sigrok-cli pulseview flashrom spdlog just`
+
+If you have Cargo, you can optionally install Just using `cargo install just`
 
 **Generating papers**
 
 Papers are written in LaTeX and built using `latexmk`. You will therefore need TeXLive and latexmk.
 You can install as follows: `yay -S texlive texlive-binextra`.
-
-The build script uses [Just](https://github.com/casey/just), a command line runner. You can acquire it with
-`cargo install just` if you have Cargo, or I believe it's on the AUR as well.
 
 **Developer tools**
 

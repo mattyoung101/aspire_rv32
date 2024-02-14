@@ -8,8 +8,8 @@ This is used for verification by differential fuzzing. Instructions are run thro
 register file is compared against the reference model.
 
 ### Building and running
-Requires CMake 3.20+, Clang, Ninja, LLD and spdlog, which can be installed using your package manager, 
-e.g. `yay -S cmake clang ninja lld spdlog`. The version of Clang must be up-to-date enough to compile C++20.
+First, install the necessary list of dependencies documented in the section "Verification tools" in the main
+README.
 
 Build (example in the fish shell):
 
@@ -21,12 +21,14 @@ cd build
 ninja
 ```
 
-Run by specifying the path to the .bin file you want to simulate (note this is not an ELF file, it's the
-result of that after objcopy):
+Run by specifying the path to the .bin file you want to simulate (note this is **not** an ELF file, it's the
+result of that after objcopy), and the simulation mode. For example:
 
 ```
-./emulator <PATH_TO_BIN>
+./emulator --mode baseline --program ../../programs/build/coremark.bin --perf yes
 ```
+
+For more help, you can use `./emulator --help`
 
 ### Licence
 Unfortunately, because riscv_em is under the GPL 3.0, the baseline emulator and fuzzer have to be GPL'd as 

@@ -20,6 +20,14 @@ static rv_ret rv_bus_access(void *priv, privilege_level priv_level, bus_access_t
         throw std::runtime_error("Illegal privilege mode");
     }
 
+    // catch out of bounds
+    if (address + len >= RAM_SIZE || address < 0) {
+        spdlog::error("Attempted to {} {} bytes at address 0x{:X} (>= 0x{:X} RAM_MAX), out of bounds!", 
+                      access_type == bus_write_access ? "write" : "read", len, address, RAM_SIZE);
+        spdlog::trace("Access type: {}", static_cast<int>(access_type));
+        throw std::runtime_error("Illegal memory access");
+    }
+
     // cursed, but works
     aspire::emu::BaselineEmulator *emu = static_cast<aspire::emu::BaselineEmulator*>(priv);
 
@@ -82,6 +90,13 @@ aspire::emu::State aspire::emu::BaselineEmulator::getState() {
         state.regfile[i] = core.x[i];
     }
     return state;
+}
+
+void aspire::emu::BaselineEmulator::injectFaultAt(uint8_t wordIdx, uint8_t bitIdx) {
+    uint32_t oldValue = core.x[wordIdx];
+    core.x[wordIdx] ^= (1 << bitIdx); // flip the bit
+    uint32_t newValue = core.x[wordIdx];
+    spdlog::info("Inject: Old value: 0x{:X}, new value: 0x{:X} (word: {}, bit: {})", oldValue, newValue, wordIdx, bitIdx);
 }
 
 void aspire::emu::BaselineEmulator::memdump(const std::string &path) {

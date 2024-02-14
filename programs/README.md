@@ -5,15 +5,8 @@ CoreMark, which is the main target program of this processor. I also want SPEC C
 
 ## Building
 ### Prerequisites
-You will need:
-- CMake 3.20+ 
-- Ninja
-- Clang
-- LLD
-- Just (command runner)
-
-On Arch you can install these using using: `yay -S cmake ninja clang lld llvm`. See the main README for
-acquiring Just.
+First, install the necessary list of dependencies documented in the section "Verification tools" in the main
+README.
 
 ### Compiling the toolchain from source
 Yes, you read right. Basically, get trolled, we have to compile the GNU toolchain (_only as a prerequisite_) 

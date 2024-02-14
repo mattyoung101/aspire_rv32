@@ -1,9 +1,9 @@
 /* Based on: https://github.com/YosysHQ/picorv32/blob/master/picosoc/sections.lds */
 
-/* General purpose Aspire entry script */
+/* Version of the Aspire linker script for the RISC-V arch tests (different entry point) */
 
 OUTPUT_ARCH(riscv)
-ENTRY(_start)
+ENTRY(rvtest_entry_point)
 
 MEMORY
 {

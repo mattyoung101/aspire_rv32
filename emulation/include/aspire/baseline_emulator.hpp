@@ -17,6 +17,9 @@ public:
         /// Steps the emulator by one cycle.
         void step();
         
+        /// Used for fault injection, flips the specified bit in the specified word in the register file.
+        void injectFaultAt(uint8_t wordIdx, uint8_t bitIdx);
+        
         /// Gets the emulator state.
         State getState();
         
