@@ -4,7 +4,7 @@
 #include <array>
 #include "aspire/config.hpp"
 #include "aspire/state.hpp"
-#include "core.h"
+#include "rv/rv.h"
 
 namespace aspire::emu {
     class BaselineEmulator {
@@ -33,8 +33,8 @@ public:
         bool exitRequested = false;
 
 private:
-        // The core itself
-        rv_core_td core;
+        // The CPU itself
+        rv cpu;
 
         // MMIO peripheral status
         uint32_t wdogRemaining = F_CPU;

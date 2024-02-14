@@ -6,7 +6,7 @@
 #include <spdlog/spdlog.h>
 #include "aspire/baseline_emulator.hpp"
 #include "aspire/state.hpp"
-#include "CLI11.hpp"
+#include "CLI11/CLI11.hpp"
 #include "pcg/pcg_random.hpp"
 
 // This file implements the main entry point of the emulator.

@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include "riscv-disas.h"
+#include "riscv-disas/riscv-disas.h"
 
 typedef struct {
     const int op;
