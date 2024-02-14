@@ -10,6 +10,7 @@ register file is compared against the reference model.
 > * The main modification was not throwing a fault on unaligned loads/stores, under the assumption that the
 > hardware will natively support this.
 > TODO: verify if RISC-V spec **requires** a fault on unaligned loads/stores
+> TODO confirm if HW will actually support this or if we have to write a fault handler and support M-mode
 
 ### Building and running
 First, install the necessary list of dependencies documented in the section "Verification tools" in the main

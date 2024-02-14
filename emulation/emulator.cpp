@@ -29,12 +29,12 @@ int main(int argc, char *argv[]) {
 
     std::string mode = "";
     app.add_option("-m,--mode", mode, "Emulation mode (one of 'baseline', 'verilator' or 'differential')")->required();
-    app.add_option("--inject", faultInjection, "Enable fault injection");
+    app.add_flag("--inject", faultInjection, "Enable fault injection");
     app.add_option("--inject-delay", faultInjectionDelay, "Query fault injection every this many cycles");
     app.add_option("--inject-chance", faultInjectionChance, "Fault injection chance (0.0 to 1.0)");
-    app.add_option("-t,--trace", trace, "Enable trace mode (very verbose)");
-    app.add_option("--ramdump", ramdump, "Dump RAM at end of program");
-    app.add_option("--perf", perf, "Print emulator performance diagnostics");
+    app.add_flag("--trace", trace, "Enable trace mode (very verbose)");
+    app.add_flag("--ramdump", ramdump, "Dump RAM at end of program");
+    app.add_flag("--perf", perf, "Print emulator performance diagnostics");
 
     std::string program = "";
     app.add_option("-p,--program", program, "Path to .bin file to load")->required()->check(CLI::ExistingFile);

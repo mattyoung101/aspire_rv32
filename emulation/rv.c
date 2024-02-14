@@ -147,7 +147,6 @@ static rv_res rv_csr_bus(rv *cpu, rv_u32 csr, rv_u32 w, rv_u32 *io) {
 
 /* trigger a trap */
 static rv_u32 rv_trap(rv *cpu, rv_u32 cause, rv_u32 tval) {
-    abort();
   rv_u32 is_interrupt = !!(cause & 0x80000000), rcause = cause & ~0x80000000;
   rv_priv xp = /* destination privilege, switch from y = cpu->priv to this */
       (cpu->priv < RV_PMACH) &&
