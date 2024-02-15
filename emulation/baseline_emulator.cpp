@@ -5,44 +5,36 @@
 #include "aspire/baseline_emulator.hpp"
 #include "aspire/config.hpp"
 #include "aspire/state.hpp"
-#include "core.h"
-#include "riscv_types.h"
-#include "riscv-disas.h"
+#include "aspire/util.hpp"
+#include "riscv-disas/riscv-disas.h"
+#include "rv/rv.h"
 
 // This file implements the baseline emulator for Aspire based on libriscv.
 // This is used for differential fuzzing against the Verilator emulator.
 
 extern "C" {
-static rv_ret rv_bus_access(void *priv, privilege_level priv_level, bus_access_type access_type, 
-                                rv_uint_xlen address, void *value, uint8_t len) {
-    if (priv_level != machine_mode) {
-        spdlog::error("Illegal privilege mode: {}", static_cast<int>(priv_level));
-        throw std::runtime_error("Illegal privilege mode");
-    }
 
+static rv_res bus_cb(void *user, rv_u32 addr, rv_u8 *data, rv_u32 is_store, rv_u32 width) {
     // catch out of bounds
-    if (address + len >= RAM_SIZE || address < 0) {
+    if (addr + width >= RAM_SIZE || addr < 0) {
         spdlog::error("Attempted to {} {} bytes at address 0x{:X} (>= 0x{:X} RAM_MAX), out of bounds!", 
-                      access_type == bus_write_access ? "write" : "read", len, address, RAM_SIZE);
-        spdlog::trace("Access type: {}", static_cast<int>(access_type));
-        throw std::runtime_error("Illegal memory access");
+                      is_store ? "write" : "read", width, addr, RAM_SIZE);
+        return RV_BAD;
     }
 
     // cursed, but works
-    aspire::emu::BaselineEmulator *emu = static_cast<aspire::emu::BaselineEmulator*>(priv);
+    aspire::emu::BaselineEmulator *emu = static_cast<aspire::emu::BaselineEmulator*>(user);
 
-    if (access_type == bus_read_access || access_type == bus_instr_access) {
-        spdlog::trace("Load {} bytes at 0x{:X}", len, address);
-        std::memcpy(value, emu->memory.data() + address, len);
-    } else if (access_type == bus_write_access) {
-        spdlog::trace("Store {} bytes at 0x{:X}", len, address);
-        std::memcpy(emu->memory.data() + address, value, len);
+    if (!is_store) {
+        //spdlog::trace("Load {} bytes at 0x{:X}", width, addr);
+        std::memcpy(data, emu->memory.data() + addr, width);
     } else {
-        spdlog::error("Unhandled access type: {}", static_cast<int>(access_type));
-        throw std::runtime_error("Unhandled access type");
+        //spdlog::trace("Store {} bytes at 0x{:X}", width, addr);
+        std::memcpy(emu->memory.data() + addr, data, width);
     }
 
-    return rv_ok;
+    return RV_OK;
+
 }
 };
 
@@ -53,28 +45,41 @@ aspire::emu::BaselineEmulator::BaselineEmulator(std::vector<uint8_t> bytes) {
     std::memcpy(memory.data() + LOAD_ADDR, bytes.data(), bytes.size());
     
     // initialise the emulator
-    rv_core_init(&core, this, rv_bus_access);
+    rv_init(&cpu, this, bus_cb);
 
     // reset MMIO to default values
     resetMMIO();
 }
 
 void aspire::emu::BaselineEmulator::step() {
+    spdlog::trace("step()");
+
     // Disassemble instruction at PC
     char buf[128] = {0};
     uint32_t instr = 0;
+    uint32_t pc = cpu.pc;
     // load 4 bytes from RAM at PC into our 32-bit instruction value
-    std::memcpy(&instr, memory.data() + core.pc, 4);
+    std::memcpy(&instr, memory.data() + pc, 4);
     // now actually disassemble it
-    disasm_inst(buf, 128, rv32, core.pc, instr);
-    spdlog::trace("Instr: {}", buf);
+    disasm_inst(buf, 128, rv32, pc, instr);
+    spdlog::trace("PC 0x{:X} Instr: {}", pc, buf);
     
     // Step the simulation
-    rv_core_run(&core);
+    auto result = rv_step(&cpu);
     
-    // Check to make sure it didn't enter machine mode
-    if (core.curr_priv_mode != machine_mode) {
-        spdlog::error("Illegal privilege mode: {}", static_cast<int>(core.curr_priv_mode));
+    // Handle faults if they occurred
+    if (result != RV_TRAP_NONE) {
+        auto mcause = cpu.csr.mcause;
+        auto trapcode = mcause & 0x7FFFFFFF;
+        auto interrupt = mcause & 0x80000000;
+        spdlog::error("CPU trap! Result: 0x{:X}, prior PC: 0x{:X}, mcause: 0x{:X}, trapcode: {} (\"{}\"), interrupt: {}", 
+                      result, pc, mcause, trapcode, aspire::emu::trapcodeToString(trapcode), interrupt);
+        throw std::runtime_error("CPU trap");
+    }
+
+    // No traps, make sure we haven't gone out of machine mode just in case
+    if (cpu.priv != RV_PMACH) {
+        spdlog::error("Illegal privilege mode: {}", cpu.priv);
         throw std::runtime_error("Illegal privilege mode");
     }
     
@@ -85,17 +90,17 @@ void aspire::emu::BaselineEmulator::step() {
 
 aspire::emu::State aspire::emu::BaselineEmulator::getState() {
     aspire::emu::State state{};
-    state.pc = core.pc;
+    state.pc = cpu.pc;
     for (int i = 0; i < 32; i++) {
-        state.regfile[i] = core.x[i];
+        state.regfile[i] = cpu.r[i];
     }
     return state;
 }
 
 void aspire::emu::BaselineEmulator::injectFaultAt(uint8_t wordIdx, uint8_t bitIdx) {
-    uint32_t oldValue = core.x[wordIdx];
-    core.x[wordIdx] ^= (1 << bitIdx); // flip the bit
-    uint32_t newValue = core.x[wordIdx];
+    uint32_t oldValue = cpu.r[wordIdx];
+    cpu.r[wordIdx] ^= (1 << bitIdx); // flip the bit
+    uint32_t newValue = cpu.r[wordIdx];
     spdlog::info("Inject: Old value: 0x{:X}, new value: 0x{:X} (word: {}, bit: {})", oldValue, newValue, wordIdx, bitIdx);
 }
 

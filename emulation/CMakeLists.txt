@@ -8,21 +8,11 @@ set(CMAKE_CXX_STANDARD 20) # C++23
 add_executable(emulator 
     emulator.cpp 
     baseline_emulator.cpp
-    riscv_em/core/csr/csr.c
-    riscv_em/core/mmu/mmu.c
-    riscv_em/core/pmp/pmp.c
-    riscv_em/core/trap/trap.c
-    riscv_em/core/core.c
+    rv.c
     riscv-disas.c
 )
 target_include_directories(emulator PRIVATE 
     include 
-    riscv_em/core 
-    riscv_em/core/csr
-    riscv_em/core/mmu
-    riscv_em/core/pmp
-    riscv_em/core/trap
-    riscv_em/helpers
 )
 target_compile_options(emulator PRIVATE "-Wall" "-Wextra" "-ggdb")
 target_compile_definitions(emulator PRIVATE "-DRISCV_EM_DEBUG")
