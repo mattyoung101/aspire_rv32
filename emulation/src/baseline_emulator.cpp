@@ -1,9 +1,11 @@
 #include <cstdint>
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <spdlog/spdlog.h>
 #include "aspire/baseline_emulator.hpp"
 #include "aspire/config.hpp"
+#include "aspire/simstop.hpp"
 #include "aspire/state.hpp"
 #include "aspire/util.hpp"
 #include "riscv-disas/riscv-disas.h"
@@ -98,9 +100,8 @@ void aspire::emu::BaselineEmulator::step() {
     }
 
     // Check sim stop
-    if (simStop.simStopRequested) {
+    if (simStop->simStopRequested) {
         spdlog::info("Received sim stop request in BaselineEmulator");
-        exit(0);
         exitRequested = true;
     }
 }

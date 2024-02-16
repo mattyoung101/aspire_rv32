@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <unordered_map>
 #include <vector>
 #include <variant>
@@ -10,12 +11,12 @@
 
 namespace aspire::mmio {
 
-using AnyMMIO = std::variant<UART, Watchdog, SimStop>;
+using AnyMMIOPtr = std::variant<std::shared_ptr<UART>, std::shared_ptr<Watchdog>, std::shared_ptr<SimStop>>;
 
 /// MMIO manager
 class MMIO {
 public:
-    explicit MMIO(std::vector<AnyMMIO> &devices) : devices(devices) {}
+    explicit MMIO(std::vector<AnyMMIOPtr> devices) : devices(devices) {}
     ~MMIO() = default;
 
     /// Called during memory access if the memory address is in the MMIO range and is a load operation.
@@ -26,6 +27,6 @@ public:
     void store(uint32_t address, uint8_t value);
 
 private:
-    std::vector<AnyMMIO> &devices;
+    std::vector<AnyMMIOPtr> devices;
 };
 };

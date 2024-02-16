@@ -8,7 +8,7 @@ uint8_t aspire::mmio::MMIO::load(uint32_t address) {
     
     for (auto &device : devices) {
         auto range = std::visit([](auto &arg) { 
-            return arg.getRange();
+            return arg->getRange();
         }, device);
         spdlog::trace("MMIO: Considering MMIO device with range 0x{:X} - 0x{:X}", range.first, range.second);
 
@@ -17,7 +17,7 @@ uint8_t aspire::mmio::MMIO::load(uint32_t address) {
             spdlog::trace("MMIO: Found matching MMIO device");
 
             return std::visit([&address](auto &arg) {
-                return arg.load(address);
+                return arg->load(address);
             }, device);
         }
     }
@@ -31,7 +31,7 @@ void aspire::mmio::MMIO::store(uint32_t address, uint8_t value) {
     
     for (auto &device : devices) {
         auto range = std::visit([](auto &arg) { 
-            return arg.getRange();
+            return arg->getRange();
         }, device);
         spdlog::trace("MMIO: Considering MMIO device with range 0x{:X} - 0x{:X}", range.first, range.second);
 
@@ -40,7 +40,7 @@ void aspire::mmio::MMIO::store(uint32_t address, uint8_t value) {
             spdlog::trace("MMIO: Found matching MMIO device");
 
             std::visit([&address, &value](auto &arg) {
-                arg.store(address, value);
+                arg->store(address, value);
             }, device);
 
             return;

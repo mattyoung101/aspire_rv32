@@ -18,7 +18,7 @@ add_executable(emulator
 target_include_directories(emulator PRIVATE 
     include 
 )
-target_compile_options(emulator PRIVATE "-Wall" "-Wextra" "-ggdb")
+target_compile_options(emulator PRIVATE "-Wall" "-Wextra" "-Wno-unused-parameter" "-ggdb")
 target_compile_definitions(emulator PRIVATE "-DRISCV_EM_DEBUG")
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL Release)

@@ -13,7 +13,6 @@ uint8_t aspire::mmio::SimStop::load(uint32_t address) {
 void aspire::mmio::SimStop::store(uint32_t address, uint8_t value) {
     if (address == ASPIRE_SIM_STOP && value == 0x1) {
         spdlog::info("MMIO: SIMSTOP: Simulation stop requested!");
-        exit(0);
         simStopRequested = true;
     }
 }

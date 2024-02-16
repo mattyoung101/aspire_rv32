@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -39,6 +40,14 @@ public:
 
     /// If set to true, the running program requested a sim exit using MMIO
     bool exitRequested = false;
+    
+    // FIXME make these private
+    std::shared_ptr<mmio::UART> uart = std::make_shared<mmio::UART>();
+    std::shared_ptr<mmio::Watchdog> watchdog = std::make_shared<mmio::Watchdog>();
+    std::shared_ptr<mmio::SimStop> simStop = std::make_shared<mmio::SimStop>();
+    
+    /// List of MMIO devices
+    std::vector<mmio::AnyMMIOPtr> mmiomap{uart, watchdog, simStop};
 
     /// MMIO manager
     mmio::MMIO mmio{mmiomap};
@@ -46,12 +55,5 @@ public:
 private:
     /// The CPU itself
     rv cpu;
-
-    mmio::Watchdog watchdog{};
-    mmio::SimStop simStop{};
-    
-    /// List of MMIO devices
-    std::vector<mmio::AnyMMIO> mmiomap{mmio::UART{}, watchdog, simStop};
-
 };
 };
