@@ -1,7 +1,6 @@
 #pragma once
-#include <cstdint>
 #include "aspire/util.hpp"
-#include <unordered_map>
+#include <cstdint>
 
 namespace aspire::mmio {
 /// Generic interface for an MMIO device
@@ -18,7 +17,7 @@ public:
     void store(uint32_t address, uint8_t value) {
         return self().store();
     }
-    
+
     /// Returns the address range this MMIO device corresponds to.
     Range getRange() {
         return self().getRange();
