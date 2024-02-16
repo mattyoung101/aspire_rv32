@@ -14,6 +14,9 @@ static constexpr uint32_t RAM_SIZE = 128 * 1024;
 
 // MMIO registers
 
+static constexpr uint32_t MMIO_BEGIN = 0x01;
+static constexpr uint32_t MMIO_END = 0x7F;
+
 static constexpr uint32_t ASPIRE_UART_RESET = 0x000001; // SW Write
 static constexpr uint32_t ASPIRE_UART_DATA = 0x000002; // SW Write
 static constexpr uint32_t ASPIRE_UART_VALID = 0x000003; // SW Write

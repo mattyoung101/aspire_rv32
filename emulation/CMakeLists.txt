@@ -6,15 +6,19 @@ set(CMAKE_CXX_STANDARD 20) # C++23
 
 # Baseline emulator executable
 add_executable(emulator 
-    emulator.cpp 
-    baseline_emulator.cpp
-    rv.c
-    riscv-disas.c
+    src/emulator.cpp 
+    src/baseline_emulator.cpp
+    src/rv.c
+    src/riscv-disas.c
+    src/mmio.cpp
+    src/simstop.cpp
+    src/uart.cpp
+    src/wdog.cpp
 )
 target_include_directories(emulator PRIVATE 
     include 
 )
-target_compile_options(emulator PRIVATE "-Wall" "-Wextra" "-ggdb")
+target_compile_options(emulator PRIVATE "-Wall" "-Wextra" "-Wno-unused-parameter" "-ggdb")
 target_compile_definitions(emulator PRIVATE "-DRISCV_EM_DEBUG")
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL Release)

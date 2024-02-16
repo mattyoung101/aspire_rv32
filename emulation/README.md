@@ -8,8 +8,8 @@ This is used for verification by differential fuzzing. Instructions are run thro
 register file is compared against the reference model.
 
 > * The main modification was not throwing a fault on unaligned loads/stores, under the assumption that the
-> hardware will natively support this.
-> TODO: verify if RISC-V spec **requires** a fault on unaligned loads/stores
+> hardware will natively support this. See Obsidian Aspire-RV32 "To raise or not to raise" for further
+> details.
 > TODO confirm if HW will actually support this or if we have to write a fault handler and support M-mode
 
 ### Building and running
