@@ -25,16 +25,33 @@ static rv_res bus_cb(void *user, rv_u32 addr, rv_u8 *data, rv_u32 is_store, rv_u
     // cursed, but works
     aspire::emu::BaselineEmulator *emu = static_cast<aspire::emu::BaselineEmulator*>(user);
 
+    // check if it's an MMIO request
+    if (addr >= MMIO_BEGIN && addr <= MMIO_END) {
+        // make sure it's not a multi-byte operation in the IO range, which we don't (yet) supported
+        if (width > 1) {
+            spdlog::error("Unsupported {} byte {} in MMIO range at address 0x{:X}", width, 
+                          is_store ? "store" : "load", addr);
+            return RV_BAD;
+        }
+
+        if (is_store) {
+            emu->mmio.store(addr, data[0]);
+            return RV_OK;
+        } else {
+            data[0] = emu->mmio.load(addr);
+            return RV_OK;
+        }
+    }
+    
+    // normal memory access
     if (!is_store) {
-        //spdlog::trace("Load {} bytes at 0x{:X}", width, addr);
         std::memcpy(data, emu->memory.data() + addr, width);
+
     } else {
-        //spdlog::trace("Store {} bytes at 0x{:X}", width, addr);
         std::memcpy(emu->memory.data() + addr, data, width);
     }
-
+    
     return RV_OK;
-
 }
 };
 
@@ -46,9 +63,6 @@ aspire::emu::BaselineEmulator::BaselineEmulator(std::vector<uint8_t> bytes) {
     
     // initialise the emulator
     rv_init(&cpu, this, bus_cb);
-
-    // reset MMIO to default values
-    resetMMIO();
 }
 
 void aspire::emu::BaselineEmulator::step() {
@@ -82,10 +96,13 @@ void aspire::emu::BaselineEmulator::step() {
         spdlog::error("Illegal privilege mode: {}", cpu.priv);
         throw std::runtime_error("Illegal privilege mode");
     }
-    
-    // check MMIO
-    // TODO only update MMIO if the previous instruction was a load/store
-    updateMMIO();
+
+    // Check sim stop
+    if (simStop.simStopRequested) {
+        spdlog::info("Received sim stop request in BaselineEmulator");
+        exit(0);
+        exitRequested = true;
+    }
 }
 
 aspire::emu::State aspire::emu::BaselineEmulator::getState() {
@@ -117,62 +134,3 @@ void aspire::emu::BaselineEmulator::memdump(const std::string &path) {
     stream.close();
 }
 
-void aspire::emu::BaselineEmulator::resetMMIO() {
-    spdlog::debug("Reset MMIO");
-    
-    // reset state in RAM
-    memory[ASPIRE_UART_READY] = 1;
-    memory[ASPIRE_WDOG_ENABLE] = 0;
-    
-    // reset internal state
-    wdogRemaining = F_CPU;
-    uartBuffer = "";
-}
-
-void aspire::emu::BaselineEmulator::updateMMIO() {
-    // Not really MMIO, but check if someone dereferenced a null pointer
-    if (memory[0] != 0) {
-        spdlog::error("Address 0x0 has been written to! Null pointer dereference!");
-        exit(1);
-    }
-
-    // Check UART
-    if (memory[ASPIRE_UART_VALID] == 1) {
-        // UART is valid! Store the character.
-        spdlog::trace("UART valid");
-
-        char c = static_cast<char>(memory[ASPIRE_UART_DATA]);
-        if (c == '\n') {
-            // on newlines, print the buffer and reset
-            spdlog::info("UART: {}", uartBuffer);
-            uartBuffer = "";
-        } else {
-            // otherwise, append to buffer
-            uartBuffer += c;
-        }
-
-        // signal the processor we have printed
-        memory[ASPIRE_UART_VALID] = 1;
-    }
-
-    // Check watchdog
-    if (memory[ASPIRE_WDOG_ENABLE] == 1) {
-        // check if watchdog was reset
-        if (memory[ASPIRE_WDOG_RESET] == 1) {
-            spdlog::info("Watchdog: Reset");
-            wdogRemaining = F_CPU;
-        }
-
-        // check if watchdog expired
-        if (wdogRemaining-- <= 0) {
-            spdlog::error("Watchdog: Timeout!");
-            exit(1);
-        }
-    }
-
-    // Check sim exit
-    if (memory[ASPIRE_SIM_STOP] == 1) {
-        spdlog::info("Simulation exit requested by running program");
-        exitRequested = true;
-    }
-}

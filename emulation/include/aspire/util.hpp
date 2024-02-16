@@ -2,6 +2,11 @@
 #include <cstdint>
 #include <string>
 
+namespace aspire {
+    /// A range, min to max inclusive
+    typedef std::pair<uint32_t, uint32_t> Range;
+};
+
 namespace aspire::emu {
 
 /// Converts an exception code from mcause into a string.
@@ -16,6 +21,7 @@ constexpr std::string trapcodeToString(uint32_t trapcode) {
         case 5: return "Load access fault";
         case 6: return "Store/AMO address misaligned";
         case 7: return "Store/AMO access fault";
+        // TODO the rest of them
         default: return "Unknown";
     }
 }

@@ -6,10 +6,14 @@ set(CMAKE_CXX_STANDARD 20) # C++23
 
 # Baseline emulator executable
 add_executable(emulator 
-    emulator.cpp 
-    baseline_emulator.cpp
-    rv.c
-    riscv-disas.c
+    src/emulator.cpp 
+    src/baseline_emulator.cpp
+    src/rv.c
+    src/riscv-disas.c
+    src/mmio.cpp
+    src/simstop.cpp
+    src/uart.cpp
+    src/wdog.cpp
 )
 target_include_directories(emulator PRIVATE 
     include 
