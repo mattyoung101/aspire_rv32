@@ -3,11 +3,12 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <utility>
+#include <cpptrace/cpptrace.hpp>
 
 uint8_t aspire::mmio::SimStop::load(uint32_t address) {
     // Can't load anything from watchdog.
     spdlog::error("MMIO: WDOG: Watchdog has no load addresses");
-    throw std::runtime_error("Cannot load in WDOG");
+    throw cpptrace::runtime_error("Cannot load in WDOG");
 }
 
 void aspire::mmio::SimStop::store(uint32_t address, uint8_t value) {

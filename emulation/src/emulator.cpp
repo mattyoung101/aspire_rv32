@@ -132,5 +132,7 @@ int main(int argc, char *argv[]) {
         baseline.memdump("/tmp/aspire_dump.bin");
     }
 
+    spdlog::info("Executed {} cycles", steps);
+
     return 0;
 }

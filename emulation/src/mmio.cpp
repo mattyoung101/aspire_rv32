@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <spdlog/spdlog.h>
 #include <variant>
+#include <cpptrace/cpptrace.hpp>
 
 uint8_t aspire::mmio::MMIO::load(uint32_t address) {
     spdlog::trace("MMIO: Load at 0x{:X}", address);
@@ -19,7 +20,7 @@ uint8_t aspire::mmio::MMIO::load(uint32_t address) {
     }
 
     spdlog::error("No matching MMIO device for load at 0x{:X}", address);
-    throw std::runtime_error("Failed to find MMIO device");
+    throw cpptrace::runtime_error("Failed to find MMIO device");
 }
 
 void aspire::mmio::MMIO::store(uint32_t address, uint8_t value) {
@@ -40,5 +41,5 @@ void aspire::mmio::MMIO::store(uint32_t address, uint8_t value) {
     }
 
     spdlog::error("MMIO: No matching MMIO device for store at 0x{:X}", address);
-    throw std::runtime_error("Failed to find MMIO device");
+    throw cpptrace::runtime_error("Failed to find MMIO device");
 }

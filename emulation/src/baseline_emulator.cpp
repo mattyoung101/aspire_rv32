@@ -10,8 +10,9 @@
 #include <iostream>
 #include <memory>
 #include <spdlog/spdlog.h>
+#include <cpptrace/cpptrace.hpp>
 
-// This file implements the baseline emulator for Aspire based on libriscv.
+// This file implements the baseline emulator for Aspire based on rv.c.
 // This is used for differential fuzzing against the Verilator emulator.
 
 extern "C" {
@@ -91,13 +92,13 @@ void aspire::emu::BaselineEmulator::step() {
         spdlog::error("CPU trap! Result: 0x{:X}, prior PC: 0x{:X}, mcause: 0x{:X}, trapcode: {} (\"{}\"), "
                       "interrupt: {}",
             result, pc, mcause, trapcode, aspire::emu::trapcodeToString(trapcode), interrupt);
-        throw std::runtime_error("CPU trap");
+        throw cpptrace::runtime_error("CPU trap");
     }
 
     // No traps, make sure we haven't gone out of machine mode just in case
     if (cpu.priv != RV_PMACH) {
         spdlog::error("Illegal privilege mode: {}", cpu.priv);
-        throw std::runtime_error("Illegal privilege mode");
+        throw cpptrace::runtime_error("Illegal privilege mode");
     }
 
     // Check sim stop

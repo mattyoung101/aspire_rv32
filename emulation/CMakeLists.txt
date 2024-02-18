@@ -3,6 +3,16 @@ project(emulation C CXX ASM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11) # C11
 set(CMAKE_CXX_STANDARD 20) # C++23
+Set(FETCHCONTENT_QUIET FALSE)
+
+include(FetchContent)
+FetchContent_Declare(
+  cpptrace
+  GIT_REPOSITORY https://github.com/jeremy-rifkin/cpptrace.git
+  GIT_TAG        v0.4.0
+  GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(cpptrace)
 
 # Baseline emulator executable
 add_executable(emulator 
@@ -35,6 +45,9 @@ endif()
 # spdlog
 find_package(spdlog REQUIRED)
 target_link_libraries(emulator spdlog::spdlog)
+
+# cpptrace
+target_link_libraries(emulator cpptrace::cpptrace)
 
 # Force LLD
 add_link_options("-fuse-ld=lld")

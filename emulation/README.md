@@ -36,8 +36,9 @@ result of that after objcopy), and the simulation mode. For example:
 For more help, you can use `./emulator --help`
 
 ### Libraries used
-TODO: licences and URLs
-- CLI11
-- PCG
-- rv
-- riscv-disas
+- [CLI11](https://github.com/CLIUtils/CLI11), a C++ command line parser: BSD 3-Clause licence
+- [PCG](https://github.com/imneme/pcg-cpp), a high-performance PRNG: MIT/Apache 2.0 licence
+- [rv](https://github.com/mnurzia/rv), a RISC-V emulator: MIT licence
+    - Minor modifications made by myself, documented in the code
+- [riscv-disas](https://github.com/michaeljclark/riscv-disassembler), a RISC-V disassembler: MIT licence
+- [cpptrace](https://github.com/jeremy-rifkin/cpptrace), a C++ stacktrace library: MIT licence

@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <utility>
+#include <cpptrace/cpptrace.hpp>
 
 uint8_t aspire::mmio::UART::load(uint32_t address) {
     if (address == ASPIRE_UART_READY) {
@@ -12,7 +13,7 @@ uint8_t aspire::mmio::UART::load(uint32_t address) {
 
     // Can't load this address
     spdlog::error("MMIO: UART: Cannot load address 0x{:X} in UART peripheral!");
-    throw std::runtime_error("Cannot load UART address");
+    throw cpptrace::runtime_error("Cannot load UART address");
 }
 
 void aspire::mmio::UART::store(uint32_t address, uint8_t value) {
