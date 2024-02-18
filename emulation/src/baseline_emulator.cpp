@@ -20,7 +20,7 @@ extern "C" {
 static rv_res bus_cb(void *user, rv_u32 addr, rv_u8 *data, rv_u32 is_store, rv_u32 width) {
     // catch out of bounds
     if (addr + width >= RAM_SIZE || addr < 0) {
-        spdlog::error("Attempted to {} {} bytes at address 0x{:X} (>= 0x{:X} RAM_MAX), out of bounds!",
+        SPDLOG_ERROR("Attempted to {} {} bytes at address 0x{:X} (>= 0x{:X} RAM_MAX), out of bounds!",
             is_store ? "write" : "read", width, addr, RAM_SIZE);
         return RV_BAD;
     }
@@ -32,7 +32,7 @@ static rv_res bus_cb(void *user, rv_u32 addr, rv_u8 *data, rv_u32 is_store, rv_u
     if (addr >= MMIO_BEGIN && addr <= MMIO_END) {
         // make sure it's not a multi-byte operation in the IO range, which we don't (yet) supported
         if (width > 1) {
-            spdlog::error("Unsupported {} byte {} in MMIO range at address 0x{:X}", width,
+            SPDLOG_ERROR("Unsupported {} byte {} in MMIO range at address 0x{:X}", width,
                 is_store ? "store" : "load", addr);
             return RV_BAD;
         }
@@ -59,7 +59,7 @@ static rv_res bus_cb(void *user, rv_u32 addr, rv_u8 *data, rv_u32 is_store, rv_u
 };
 
 aspire::emu::BaselineEmulator::BaselineEmulator(std::vector<uint8_t> bytes) {
-    spdlog::debug("Initialising BaselineEmulator");
+    SPDLOG_DEBUG("Initialising BaselineEmulator");
 
     // load program into memory
     std::memcpy(memory.data() + LOAD_ADDR, bytes.data(), bytes.size());
@@ -69,7 +69,7 @@ aspire::emu::BaselineEmulator::BaselineEmulator(std::vector<uint8_t> bytes) {
 }
 
 void aspire::emu::BaselineEmulator::step() {
-    spdlog::trace("step()");
+    SPDLOG_TRACE("step()");
 
     // Disassemble instruction at PC
     char buf[128] = { 0 };
@@ -79,7 +79,7 @@ void aspire::emu::BaselineEmulator::step() {
     std::memcpy(&instr, memory.data() + pc, 4);
     // now actually disassemble it
     disasm_inst(buf, 128, rv32, pc, instr);
-    spdlog::trace("PC 0x{:X} Instr: {}", pc, buf);
+    SPDLOG_TRACE("PC 0x{:X} Instr: {}", pc, buf);
 
     // Step the simulation
     auto result = rv_step(&cpu);
@@ -89,7 +89,7 @@ void aspire::emu::BaselineEmulator::step() {
         auto mcause = cpu.csr.mcause;
         auto trapcode = mcause & 0x7FFFFFFF;
         auto interrupt = mcause & 0x80000000;
-        spdlog::error("CPU trap! Result: 0x{:X}, prior PC: 0x{:X}, mcause: 0x{:X}, trapcode: {} (\"{}\"), "
+        SPDLOG_ERROR("CPU trap! Result: 0x{:X}, prior PC: 0x{:X}, mcause: 0x{:X}, trapcode: {} (\"{}\"), "
                       "interrupt: {}",
             result, pc, mcause, trapcode, aspire::emu::trapcodeToString(trapcode), interrupt);
         throw cpptrace::runtime_error("CPU trap");
@@ -97,13 +97,13 @@ void aspire::emu::BaselineEmulator::step() {
 
     // No traps, make sure we haven't gone out of machine mode just in case
     if (cpu.priv != RV_PMACH) {
-        spdlog::error("Illegal privilege mode: {}", cpu.priv);
+        SPDLOG_ERROR("Illegal privilege mode: {}", cpu.priv);
         throw cpptrace::runtime_error("Illegal privilege mode");
     }
 
     // Check sim stop
     if (simStop->simStopRequested) {
-        spdlog::info("Received sim stop request in BaselineEmulator");
+        SPDLOG_INFO("Received sim stop request in BaselineEmulator");
         exitRequested = true;
     }
 }
@@ -121,12 +121,12 @@ void aspire::emu::BaselineEmulator::injectFaultAt(uint8_t wordIdx, uint8_t bitId
     uint32_t oldValue = cpu.r[wordIdx];
     cpu.r[wordIdx] ^= (1 << bitIdx); // flip the bit
     uint32_t newValue = cpu.r[wordIdx];
-    spdlog::info("Inject: Old value: 0x{:X}, new value: 0x{:X} (word: {}, bit: {})", oldValue, newValue,
+    SPDLOG_INFO("Inject: Old value: 0x{:X}, new value: 0x{:X} (word: {}, bit: {})", oldValue, newValue,
         wordIdx, bitIdx);
 }
 
 void aspire::emu::BaselineEmulator::memdump(const std::string &path) {
-    spdlog::info("Dumping contents of RAM to file {}", path);
+    SPDLOG_INFO("Dumping contents of RAM to file {}", path);
 
     // copy RAM locally
     char bytes[RAM_SIZE] = { 0 };

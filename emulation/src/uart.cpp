@@ -12,7 +12,7 @@ uint8_t aspire::mmio::UART::load(uint32_t address) {
     }
 
     // Can't load this address
-    spdlog::error("MMIO: UART: Cannot load address 0x{:X} in UART peripheral!");
+    SPDLOG_ERROR("MMIO: UART: Cannot load address 0x{:X} in UART peripheral!");
     throw cpptrace::runtime_error("Cannot load UART address");
 }
 
@@ -20,7 +20,7 @@ void aspire::mmio::UART::store(uint32_t address, uint8_t value) {
     switch (address) {
         case ASPIRE_UART_RESET:
             if (value == 0x1) {
-                spdlog::debug("MMIO: UART: Reset UART");
+                SPDLOG_DEBUG("MMIO: UART: Reset UART");
                 buffer = "";
                 c = '\0';
             }
@@ -29,7 +29,7 @@ void aspire::mmio::UART::store(uint32_t address, uint8_t value) {
         case ASPIRE_UART_DATA:
             c = static_cast<char>(value);
             buffer += c;
-            spdlog::trace("MMIO: UART: Store {}, buffer: {}", c, buffer);
+            SPDLOG_TRACE("MMIO: UART: Store {}, buffer: {}", c, buffer);
             break;
 
         case ASPIRE_UART_VALID:
@@ -37,7 +37,7 @@ void aspire::mmio::UART::store(uint32_t address, uint8_t value) {
             if (c == '\n' && value == 0x1) {
                 // remove the '\n'
                 buffer.pop_back();
-                spdlog::info("UART: {}", buffer);
+                SPDLOG_INFO("UART: {}", buffer);
                 // reset internal state
                 buffer = "";
                 c = '\0';
@@ -46,7 +46,7 @@ void aspire::mmio::UART::store(uint32_t address, uint8_t value) {
             break;
 
         default:
-            spdlog::error("MMIO: UART: Cannot store address 0x{:X} (value 0x{:X})", address, value);
+            SPDLOG_ERROR("MMIO: UART: Cannot store address 0x{:X} (value 0x{:X})", address, value);
     }
 }
 

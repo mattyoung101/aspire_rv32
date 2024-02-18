@@ -49,32 +49,32 @@ int main(int argc, char *argv[]) {
     } else {
         spdlog::set_level(spdlog::level::debug);
     }
-    spdlog::info("Aspire Emulator - (c) 2024 Matt Young.");
+    SPDLOG_INFO("Aspire Emulator - (c) 2024 Matt Young.");
 
     // check mode
     if (mode != "baseline" && mode != "verilator" && mode != "differential") {
-        spdlog::error("Invalid mode: {}", mode);
+        SPDLOG_ERROR("Invalid mode: {}", mode);
         return 1;
     }
 
     // check fault injection
     if (faultInjectionChance <= 0.0 || faultInjectionChance > 1.0) {
-        spdlog::error(
+        SPDLOG_ERROR(
             "Fault injection chance must be between 0.0 and 1.0, you said: {}", faultInjectionChance);
         return 1;
     }
 
     // dump fault injection config
     if (faultInjection) {
-        spdlog::info("Fault injection: delay: {}, chance: {}", faultInjectionDelay, faultInjectionChance);
+        SPDLOG_INFO("Fault injection: delay: {}, chance: {}", faultInjectionDelay, faultInjectionChance);
     }
 
     // based on https://github.com/fwsGonzo/libriscv/blob/master/examples/embed/example.cpp
     // Read the RISC-V program into a std::vector
-    spdlog::info("Loading program: {}", program);
+    SPDLOG_INFO("Loading program: {}", program);
     std::ifstream stream(program, std::ios::in | std::ios::binary);
     if (!stream) {
-        spdlog::error("Unable to load program: {}", strerror(errno));
+        SPDLOG_ERROR("Unable to load program: {}", strerror(errno));
         return 1;
     }
     const std::vector<uint8_t> binary(
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
         if (faultInjection && steps % faultInjectionDelay == 0 && faultDist(rng) <= faultInjectionChance) {
             auto wordIdx = bitDist(rng);
             auto bitIdx = bitDist(rng);
-            spdlog::info("Inject: Going to inject a fault this tick, reg {}, bit {}", wordIdx, bitIdx);
+            SPDLOG_INFO("Inject: Going to inject a fault this tick, reg {}, bit {}", wordIdx, bitIdx);
             baseline.injectFaultAt(wordIdx, bitIdx);
         }
 
@@ -119,11 +119,11 @@ int main(int argc, char *argv[]) {
             double hz = 1.0 / (average / 1e+9);
             double mhz = hz / 1'000'000.0;
             if (perf)
-                spdlog::info("Performance: {:.2f} ns ({:.2f} MHz)", average, mhz);
+                SPDLOG_INFO("Performance: {:.2f} ns ({:.2f} MHz)", average, mhz);
         }
 
         if (baseline.exitRequested) {
-            spdlog::info("Exiting simulation as requested");
+            SPDLOG_INFO("Exiting simulation as requested");
             break;
         }
     }
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
         baseline.memdump("/tmp/aspire_dump.bin");
     }
 
-    spdlog::info("Executed {} cycles", steps);
+    SPDLOG_INFO("Executed {} cycles", steps);
 
     return 0;
 }

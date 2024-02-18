@@ -7,9 +7,10 @@ The disassembly trace is powered by [riscv-disassembler](https://github.com/mich
 This is used for verification by differential fuzzing. Instructions are run through the Verilator model, whose
 register file is compared against the reference model.
 
-> * The main modification was not throwing a fault on unaligned loads/stores, under the assumption that the
+> \* The main modification was not throwing a fault on unaligned loads/stores, under the assumption that the
 > hardware will natively support this. See Obsidian Aspire-RV32 "To raise or not to raise" for further
 > details.
+>
 > TODO confirm if HW will actually support this or if we have to write a fault handler and support M-mode
 
 ### Building and running
