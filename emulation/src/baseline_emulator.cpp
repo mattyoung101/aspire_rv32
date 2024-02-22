@@ -1,6 +1,5 @@
 #include "aspire/baseline_emulator.hpp"
 #include "aspire/config.hpp"
-#include "aspire/simstop.hpp"
 #include "aspire/state.hpp"
 #include "aspire/util.hpp"
 #include "riscv-disas/riscv-disas.h"
@@ -8,7 +7,6 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
-#include <memory>
 #include <spdlog/spdlog.h>
 #include <cpptrace/cpptrace.hpp>
 
@@ -62,6 +60,10 @@ aspire::emu::BaselineEmulator::BaselineEmulator(std::vector<uint8_t> bytes) {
     SPDLOG_DEBUG("Initialising BaselineEmulator");
 
     // load program into memory
+    if (LOAD_ADDR + bytes.size() > RAM_SIZE) {
+        SPDLOG_ERROR("Program of {} bytes is too large to fit into RAM of {} bytes!", bytes.size(), RAM_SIZE);
+        throw cpptrace::runtime_error("Program too large");
+    }
     std::memcpy(memory.data() + LOAD_ADDR, bytes.data(), bytes.size());
 
     // initialise the emulator

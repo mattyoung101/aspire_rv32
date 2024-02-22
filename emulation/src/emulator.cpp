@@ -1,5 +1,7 @@
 #include "CLI11/CLI11.hpp"
 #include "aspire/baseline_emulator.hpp"
+#include "aspire/config.hpp"
+#include "aspire/util.hpp"
 #include "pcg/pcg_random.hpp"
 #include <cerrno>
 #include <chrono>
@@ -17,6 +19,8 @@ double faultInjectionChance = 0.25;
 bool trace = false;
 bool ramdump = false;
 bool perf = false;
+double freq = F_CPU;
+double period = aspire::mHzToNanos(freq);
 
 size_t steps = 0;
 double sumNs = 0.0;
@@ -35,6 +39,7 @@ int main(int argc, char *argv[]) {
     app.add_flag("--trace", trace, "Enable trace mode (very verbose)");
     app.add_flag("--ramdump", ramdump, "Dump RAM at end of program");
     app.add_flag("--perf", perf, "Print emulator performance diagnostics");
+    app.add_option("--freq", freq, "Target emulator CPU frequency in MHz");
 
     std::string program = "";
     app.add_option("-p,--program", program, "Path to .bin file to load")
@@ -68,6 +73,9 @@ int main(int argc, char *argv[]) {
     if (faultInjection) {
         SPDLOG_INFO("Fault injection: delay: {}, chance: {}", faultInjectionDelay, faultInjectionChance);
     }
+    
+    period = aspire::mHzToNanos(freq);
+    SPDLOG_INFO("Emulation target frequency: {} MHz (period: {:.2f} ns)", freq, period);
 
     // based on https://github.com/fwsGonzo/libriscv/blob/master/examples/embed/example.cpp
     // Read the RISC-V program into a std::vector

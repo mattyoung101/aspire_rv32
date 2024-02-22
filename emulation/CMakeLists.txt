@@ -10,7 +10,7 @@ FetchContent_Declare(
   cpptrace
   GIT_REPOSITORY https://github.com/jeremy-rifkin/cpptrace.git
   GIT_TAG        v0.4.0
-  GIT_PROGRESS TRUE
+  GIT_PROGRESS   TRUE
 )
 FetchContent_MakeAvailable(cpptrace)
 

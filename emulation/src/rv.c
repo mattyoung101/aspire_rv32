@@ -419,10 +419,11 @@ static rv_u32 rv_bus(rv *cpu, rv_u32 *va, rv_u8 *data, rv_u32 width,
   rv_u32 err, pa /* physical address */;
   rv_u8 ledata[4];
   rv_endcvt(data, ledata, width, 1);
+  // NOTE:
   // Aspire: Don't fault on unaligned. Assume our hardware will support unaligned.
+  // TODO Aspire: Check if spec **requires** a fault on unaligned loads
   // if (*va & (width - 1))
   //   return RV_BAD_ALIGN;
-  // TODO(Aspire): Check if spec **requires** a fault on unaligned loads
   if ((err = rv_vmm(cpu, *va, &pa, access)))
     return err; /* page or access fault */
   if (((pa + width - 1) ^ pa) & ~0xFFFU) /* page bound overrun */ {
