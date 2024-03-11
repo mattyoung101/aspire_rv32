@@ -19,7 +19,7 @@ double faultInjectionChance = 0.25;
 bool trace = false;
 bool ramdump = false;
 bool perf = false;
-double freq = F_CPU;
+double freq = F_CPU / 1'000'000.0;
 double period = aspire::mHzToNanos(freq);
 
 size_t steps = 0;

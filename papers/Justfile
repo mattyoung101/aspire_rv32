@@ -1,0 +1,20 @@
+LATEXMK_COMMAND := "latexmk -shell-escape -pdf -quiet"
+
+default:
+	@just --list
+
+# Generates all papers
+papers: proposal
+
+# Watches for edits to LaTeX and auto re-generates them
+# Based on: https://superuser.com/a/665208
+watch:
+    find . -name '*.tex' | entr just papers
+
+# Generates thesis proposal document from LaTeX
+proposal:
+	cd proposal && {{LATEXMK_COMMAND}} proposal.tex
+
+# Generate lit review from LaTeX
+lit:
+    cd lit_review && {{LATEXMK_COMMAND}} litreview.tex

@@ -66,12 +66,13 @@ You need the following long list of tools:
 All of these are in the regular Arch repos: `yay -S cmake clang lld llvm ninja verilator gtkwave iverilog
 sigrok-cli pulseview flashrom spdlog just`
 
-If you have Cargo, you can optionally install Just using `cargo install just`
-
 **Generating papers**
 
 Papers are written in LaTeX and built using `latexmk`. You will therefore need TeXLive and latexmk.
 You can install as follows: `yay -S texlive texlive-binextra`.
+
+If you install `entr` using `yay -S entr`, you can use `just watch` to automatically recompile the papers
+whenever they are modified.
 
 **Developer tools**
 
