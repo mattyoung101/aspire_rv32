@@ -22,8 +22,6 @@
 "                            ##                                  \n" \
 "                             ##                                 \n" \
 "                                                                \n" \
-"                     ~ THE DESIRE TO SUCCEED ~                  \n" \
-"								                                 \n" \
 "								                                 \n" \
 "      * (c) 2024, 2025 Matt Young. University of Queensland. *  \n" \
 

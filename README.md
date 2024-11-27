@@ -1,32 +1,19 @@
 # Aspire - A RISC-V RV32 Processor
-_Aspire_ is a RISC-V CPU designed for my Bachelor of Computer Science (Honours) thesis project at
-the University of Queensland. The title of the thesis is,
-"A triple modular redundancy fault tolerant RISC-V processor for safety-critical applications".
+_Aspire_ was a RISC-V CPU that was going to be designed for my Bachelor of Computer Science (Honours) thesis
+project at the University of Queensland. The title of the thesis was going to be "A triple modular redundancy
+fault tolerant RISC-V processor for safety-critical applications".
 
-Aspire is designed in SystemVerilog, and implements the RV32I_Zmmul_Zicsr instruction set
-architecture. The processor uses triple-modular redundancy (TMR) to prevent single-event upsets (SEUs),
-making it potentially useful in safety-critical and rad-hardened applications. Particular industry
+Aspire is designed in SystemVerilog, and was going to implement the RV32I_Zmmul_Zicsr instruction set
+architecture. The processor was going to use triple-modular redundancy (TMR) to prevent single-event upsets
+(SEUs), making it potentially useful in safety-critical and rad-hardened applications. Particular industry
 areas where the processor may be useful include space, defence, medical and automotive.
 
-**Disclaimer:** Although intended for safety-critical applications, Aspire is a thesis project and
-is not certified or audited in any capacity. There is no warranty, and I make no guarantees of 
-correctness. Please carefully consider if these factors make Aspire suitable for your use-case.
+Aspire has instead been replaced by my new thesis project, _TaMaRa_, which is an automated triple modular
+redundancy EDA flow for Yosys. This is basically taking the same principles behind Aspire, but making it
+applicable to _all_ circuits rather than just this particular CPU.
 
-## Features
-- TBA
-- Implements RV32I_Zmmul_Zicsr ISA
-    - Features a single cycle 32x32-bit multiplier, 64-bit result, both signed/unsigned
-    - (Maybe) Supports `clz` from Zbb (no other instructions from that extension though)
-- Hardware UART TX peripheral (115200 baud, 8 bit word size, 1 stop bit, no parity)
-   - Based on this upstream project: https://github.com/medalotte/SystemVerilog-UART (MIT licence)
-   - Minor in-house modifications to simplify it (removed RX, etc)
-   - Not currently software reconfigurable, i.e., config (including baud rate!) is fixed in hardware
-- Watchdog timer
-    - Can be reset, enabled and disabled by software
-    - 1 second timeout (not currently software configurable)
-    - If the timeout expires, the watchdog peripheral will trigger a hardware system reset automatically
-- (Extension) GPIO
-    - Based on (TODO upstream)
+Despite not being started really, there's probably some use to be gained from the emulator in the `emulation`
+directory.
 
 ## Getting started with Aspire
 ### Cloning
@@ -105,47 +92,9 @@ Make sure you have the necessary dependencies as described in Setting up the too
 TODO automatic recompile when changed
 
 ## Licence
-SystemVerilog code: (TODO check with UQ, one of MPL 2.0 or Apache)
+Copyright (c) 2024 Matt Young.
 
-Paper: TODO check with UQ, hopefully CC-BY or something?
+Code and tests are available under the **Mozilla Public License v2.0**, see the file LICENSE.code.
 
-The RTL will most likely initially be released under the Mozilla Public License v2.0, a nice hybrid
-permissive-copyleft licence. However, there are already a gazillion RISC-V implementations out there in the
-wild, so it may be better to keep the licence simple and permissive, like the Apache 2.0. I'm still
-considering. Might also consider even more lax licences like the 0BSD.
-
-As a UQ student, I may also be subject to the university's whims regarding licencing and IP. I will need to
-check that I am legally the sole owner of this project's IP and can open source it before doing so. To the
-best of my knowledge, as an honours student I am able to keep my IP, but this needs thorough checking.
-
-I'm planning to release the paper LaTeX sources under CC-BY, but I need to check with the uni's academic
-integrity policy to make sure this is allowed. I'm also hoping to convert this thesis into a paper and publish
-in an open access journal like IEEE Access, or at least arXiv.
-
----
-
-```
-        ##                                                      
-     /####                              #                       
-    /  ###                             ###                      
-       /##                              #                       
-      /  ##                                                     
-      /  ##          /###      /###   ###   ###  /###     /##   
-     /    ##        / #### /  / ###  / ###   ###/ #### / / ###  
-     /    ##       ##  ###/  /   ###/   ##    ##   ###/ /   ### 
-    /      ##     ####      ##    ##    ##    ##       ##    ###
-    /########       ###     ##    ##    ##    ##       ######## 
-   /        ##        ###   ##    ##    ##    ##       #######  
-   #        ##          ### ##    ##    ##    ##       ##       
-  /####      ##    /###  ## ##    ##    ##    ##       ####    /
- /   ####    ## / / #### /  #######     ### / ###       ######/ 
-/     ##      #/     ###/   ######       ##/   ###       #####  
-#                           ##                                  
- ##                         ##                                  
-                            ##                                  
-                             ##                                 
-                                                                
-                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~                                            
-                     ~~ THE DESIRE TO SUCCEED ~~       
-                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
+Papers and slides (in the `papers` directory) are available under **CC Attribution 4.0 International**,
+see the file LICENSE.papers.
